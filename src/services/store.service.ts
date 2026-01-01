@@ -1,9 +1,11 @@
 
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 import { Question, AppState } from '../models/types';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
+  private readonly STORAGE_KEY = 'docubrain_persistent_state';
+
   private state = signal<AppState>({
     knowledgeBaseFiles: [],
     knowledgeBaseText: '',
@@ -12,6 +14,37 @@ export class StoreService {
     isAnalyzing: false,
     progress: 0
   });
+
+  constructor() {
+    // Caricamento iniziale dallo storage
+    const savedState = localStorage.getItem(this.STORAGE_KEY);
+    if (savedState) {
+      try {
+        const parsed = JSON.parse(savedState);
+        // Ripristiniamo solo i dati permanenti, resettando quelli di processo
+        this.state.set({
+          ...parsed,
+          isAnalyzing: false,
+          progress: 0
+        });
+      } catch (e) {
+        console.error('Errore nel ripristino della sessione precedente:', e);
+      }
+    }
+
+    // Effetto per il salvataggio automatico ad ogni cambiamento del segnale
+    effect(() => {
+      const currentState = this.state();
+      // Non persistiamo lo stato di analisi in corso per evitare loop al refresh
+      const { isAnalyzing, progress, ...persistentData } = currentState;
+      
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(persistentData));
+      } catch (e) {
+        console.warn('Limite di archiviazione locale raggiunto. Alcuni dati potrebbero non essere persistenti.', e);
+      }
+    });
+  }
 
   // Selectors
   knowledgeBase = computed(() => this.state().knowledgeBaseText);
