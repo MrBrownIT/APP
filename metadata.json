@@ -1,0 +1,6 @@
+
+{
+  "name": "DocuBrain AI",
+  "description": "Motore di ricerca intelligente mobile-first per i tuoi documenti, potenziato da Gemini 2.5 Flash. Carica PDF per creare la tua base di conoscenza e analizza set di domande con precisione.",
+  "requestFramePermissions": []
+}
