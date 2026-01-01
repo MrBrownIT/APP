@@ -1,7 +1,4 @@
-import {
-  __async,
-  __yieldStar
-} from "./chunk-BJWEDLTQ.js";
+import "./chunk-GOMI4DH3.js";
 
 // node_modules/@google/genai/dist/web/index.mjs
 var _defaultBaseGeminiUrl = void 0;
@@ -3394,10 +3391,10 @@ var Pager = class {
    */
   [Symbol.asyncIterator]() {
     return {
-      next: () => __async(this, null, function* () {
+      next: async () => {
         if (this.idxInternal >= this.pageLength) {
           if (this.hasNextPage()) {
-            yield this.nextPage();
+            await this.nextPage();
           } else {
             return { value: void 0, done: true };
           }
@@ -3405,10 +3402,10 @@ var Pager = class {
         const item = this.getItem(this.idxInternal);
         this.idxInternal += 1;
         return { value: item, done: false };
-      }),
-      return: () => __async(this, null, function* () {
+      },
+      return: async () => {
         return { value: void 0, done: true };
-      })
+      }
     };
   }
   /**
@@ -3432,15 +3429,13 @@ var Pager = class {
    * }
    * ```
    */
-  nextPage() {
-    return __async(this, null, function* () {
-      if (!this.hasNextPage()) {
-        throw new Error("No more pages to fetch.");
-      }
-      const response = yield this.requestInternal(this.params);
-      this.initNextPage(response);
-      return this.page;
-    });
+  async nextPage() {
+    if (!this.hasNextPage()) {
+      throw new Error("No more pages to fetch.");
+    }
+    const response = await this.requestInternal(this.params);
+    this.initNextPage(response);
+    return this.page;
   }
   /**
    * Returns true if there are more pages to fetch from the API.
@@ -3457,22 +3452,22 @@ var Batches = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.list = (..._0) => __async(this, [..._0], function* (params = {}) {
-      return new Pager(PagedItem.PAGED_ITEM_BATCH_JOBS, (x) => this.listInternal(x), yield this.listInternal(params), params);
-    });
-    this.create = (params) => __async(this, null, function* () {
+    this.list = async (params = {}) => {
+      return new Pager(PagedItem.PAGED_ITEM_BATCH_JOBS, (x) => this.listInternal(x), await this.listInternal(params), params);
+    };
+    this.create = async (params) => {
       if (this.apiClient.isVertexAI()) {
         params.config = this.formatDestination(params.src, params.config);
       }
       return this.createInternal(params);
-    });
-    this.createEmbeddings = (params) => __async(this, null, function* () {
+    };
+    this.createEmbeddings = async (params) => {
       console.warn("batches.createEmbeddings() is experimental and may change without notice.");
       if (this.apiClient.isVertexAI()) {
         throw new Error("Vertex AI does not support batches.createEmbeddings.");
       }
       return this.createEmbeddingsInternal(params);
-    });
+    };
   }
   // Helper function to handle inlined generate content requests
   createInlinedGenerateContentRequest(params) {
@@ -3556,54 +3551,52 @@ var Batches = class extends BaseModule {
    * @return The created batch job.
    *
    */
-  createInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = createBatchJobParametersToVertex(this.apiClient, params);
-        path2 = formatMap("batchPredictionJobs", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = batchJobFromVertex(apiResponse);
-          return resp;
-        });
-      } else {
-        const body = createBatchJobParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:batchGenerateContent", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = batchJobFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+  async createInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = createBatchJobParametersToVertex(this.apiClient, params);
+      path2 = formatMap("batchPredictionJobs", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = batchJobFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = createBatchJobParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:batchGenerateContent", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = batchJobFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
   /**
    * Internal method to create batch job.
@@ -3612,36 +3605,34 @@ var Batches = class extends BaseModule {
    * @return The created batch job.
    *
    */
-  createEmbeddingsInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = createEmbeddingsBatchJobParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:asyncBatchEmbedContent", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = batchJobFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+  async createEmbeddingsInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = createEmbeddingsBatchJobParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:asyncBatchEmbedContent", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = batchJobFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
   /**
    * Gets batch job configurations.
@@ -3654,54 +3645,52 @@ var Batches = class extends BaseModule {
    * await ai.batches.get({name: '...'}); // The server-generated resource name.
    * ```
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = getBatchJobParametersToVertex(this.apiClient, params);
-        path2 = formatMap("batchPredictionJobs/{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = batchJobFromVertex(apiResponse);
-          return resp;
-        });
-      } else {
-        const body = getBatchJobParametersToMldev(this.apiClient, params);
-        path2 = formatMap("batches/{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = batchJobFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = getBatchJobParametersToVertex(this.apiClient, params);
+      path2 = formatMap("batchPredictionJobs/{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = batchJobFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = getBatchJobParametersToMldev(this.apiClient, params);
+      path2 = formatMap("batches/{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = batchJobFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
   /**
    * Cancels a batch job.
@@ -3714,106 +3703,102 @@ var Batches = class extends BaseModule {
    * await ai.batches.cancel({name: '...'}); // The server-generated resource name.
    * ```
    */
-  cancel(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = cancelBatchJobParametersToVertex(this.apiClient, params);
-        path2 = formatMap("batchPredictionJobs/{name}:cancel", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        yield this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        });
-      } else {
-        const body = cancelBatchJobParametersToMldev(this.apiClient, params);
-        path2 = formatMap("batches/{name}:cancel", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        yield this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        });
-      }
-    });
+  async cancel(params) {
+    var _a2, _b, _c, _d;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = cancelBatchJobParametersToVertex(this.apiClient, params);
+      path2 = formatMap("batchPredictionJobs/{name}:cancel", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      await this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      });
+    } else {
+      const body = cancelBatchJobParametersToMldev(this.apiClient, params);
+      path2 = formatMap("batches/{name}:cancel", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      await this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = listBatchJobsParametersToVertex(params);
-        path2 = formatMap("batchPredictionJobs", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async listInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = listBatchJobsParametersToVertex(params);
+      path2 = formatMap("batchPredictionJobs", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = listBatchJobsResponseFromVertex(apiResponse);
-          const typedResp = new ListBatchJobsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = listBatchJobsResponseFromVertex(apiResponse);
+        const typedResp = new ListBatchJobsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = listBatchJobsParametersToMldev(params);
+      path2 = formatMap("batches", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = listBatchJobsParametersToMldev(params);
-        path2 = formatMap("batches", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = listBatchJobsResponseFromMldev(apiResponse);
-          const typedResp = new ListBatchJobsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = listBatchJobsResponseFromMldev(apiResponse);
+        const typedResp = new ListBatchJobsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Deletes a batch job.
@@ -3826,66 +3811,64 @@ var Batches = class extends BaseModule {
    * await ai.batches.delete({name: '...'}); // The server-generated resource name.
    * ```
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = deleteBatchJobParametersToVertex(this.apiClient, params);
-        path2 = formatMap("batchPredictionJobs/{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async delete(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = deleteBatchJobParametersToVertex(this.apiClient, params);
+      path2 = formatMap("batchPredictionJobs/{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = deleteResourceJobFromVertex(apiResponse);
-          return resp;
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteResourceJobFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = deleteBatchJobParametersToMldev(this.apiClient, params);
+      path2 = formatMap("batches/{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = deleteBatchJobParametersToMldev(this.apiClient, params);
-        path2 = formatMap("batches/{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = deleteResourceJobFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteResourceJobFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
 };
 function blobToMldev$3(fromObject) {
@@ -4547,9 +4530,9 @@ var Caches = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.list = (..._0) => __async(this, [..._0], function* (params = {}) {
-      return new Pager(PagedItem.PAGED_ITEM_CACHED_CONTENTS, (x) => this.listInternal(x), yield this.listInternal(params), params);
-    });
+    this.list = async (params = {}) => {
+      return new Pager(PagedItem.PAGED_ITEM_CACHED_CONTENTS, (x) => this.listInternal(x), await this.listInternal(params), params);
+    };
   }
   /**
    * Creates a cached contents resource.
@@ -4577,52 +4560,50 @@ var Caches = class extends BaseModule {
    * });
    * ```
    */
-  create(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = createCachedContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("cachedContents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      } else {
-        const body = createCachedContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("cachedContents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async create(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = createCachedContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("cachedContents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    } else {
+      const body = createCachedContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("cachedContents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Gets cached content configurations.
@@ -4635,52 +4616,50 @@ var Caches = class extends BaseModule {
    * await ai.caches.get({name: '...'}); // The server-generated resource name.
    * ```
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = getCachedContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      } else {
-        const body = getCachedContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = getCachedContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    } else {
+      const body = getCachedContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Deletes cached content.
@@ -4693,70 +4672,68 @@ var Caches = class extends BaseModule {
    * await ai.caches.delete({name: '...'}); // The server-generated resource name.
    * ```
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = deleteCachedContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async delete(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = deleteCachedContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = deleteCachedContentResponseFromVertex(apiResponse);
-          const typedResp = new DeleteCachedContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteCachedContentResponseFromVertex(apiResponse);
+        const typedResp = new DeleteCachedContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = deleteCachedContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = deleteCachedContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = deleteCachedContentResponseFromMldev(apiResponse);
-          const typedResp = new DeleteCachedContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteCachedContentResponseFromMldev(apiResponse);
+        const typedResp = new DeleteCachedContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Updates cached content configurations.
@@ -4772,117 +4749,113 @@ var Caches = class extends BaseModule {
    * });
    * ```
    */
-  update(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = updateCachedContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "PATCH",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      } else {
-        const body = updateCachedContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "PATCH",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async update(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = updateCachedContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "PATCH",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    } else {
+      const body = updateCachedContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "PATCH",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = listCachedContentsParametersToVertex(params);
-        path2 = formatMap("cachedContents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async listInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = listCachedContentsParametersToVertex(params);
+      path2 = formatMap("cachedContents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = listCachedContentsResponseFromVertex(apiResponse);
-          const typedResp = new ListCachedContentsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = listCachedContentsResponseFromVertex(apiResponse);
+        const typedResp = new ListCachedContentsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = listCachedContentsParametersToMldev(params);
+      path2 = formatMap("cachedContents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = listCachedContentsParametersToMldev(params);
-        path2 = formatMap("cachedContents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = listCachedContentsResponseFromMldev(apiResponse);
-          const typedResp = new ListCachedContentsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = listCachedContentsResponseFromMldev(apiResponse);
+        const typedResp = new ListCachedContentsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
 };
 function __rest(s, e) {
@@ -5101,35 +5074,33 @@ var Chat = class {
    * console.log(response.text);
    * ```
    */
-  sendMessage(params) {
-    return __async(this, null, function* () {
-      var _a2;
-      yield this.sendPromise;
-      const inputContent = tContent(params.message);
-      const responsePromise = this.modelsModule.generateContent({
-        model: this.model,
-        contents: this.getHistory(true).concat(inputContent),
-        config: (_a2 = params.config) !== null && _a2 !== void 0 ? _a2 : this.config
-      });
-      this.sendPromise = (() => __async(this, null, function* () {
-        var _a3, _b, _c;
-        const response = yield responsePromise;
-        const outputContent = (_b = (_a3 = response.candidates) === null || _a3 === void 0 ? void 0 : _a3[0]) === null || _b === void 0 ? void 0 : _b.content;
-        const fullAutomaticFunctionCallingHistory = response.automaticFunctionCallingHistory;
-        const index = this.getHistory(true).length;
-        let automaticFunctionCallingHistory = [];
-        if (fullAutomaticFunctionCallingHistory != null) {
-          automaticFunctionCallingHistory = (_c = fullAutomaticFunctionCallingHistory.slice(index)) !== null && _c !== void 0 ? _c : [];
-        }
-        const modelOutput = outputContent ? [outputContent] : [];
-        this.recordHistory(inputContent, modelOutput, automaticFunctionCallingHistory);
-        return;
-      }))();
-      yield this.sendPromise.catch(() => {
-        this.sendPromise = Promise.resolve();
-      });
-      return responsePromise;
+  async sendMessage(params) {
+    var _a2;
+    await this.sendPromise;
+    const inputContent = tContent(params.message);
+    const responsePromise = this.modelsModule.generateContent({
+      model: this.model,
+      contents: this.getHistory(true).concat(inputContent),
+      config: (_a2 = params.config) !== null && _a2 !== void 0 ? _a2 : this.config
     });
+    this.sendPromise = (async () => {
+      var _a3, _b, _c;
+      const response = await responsePromise;
+      const outputContent = (_b = (_a3 = response.candidates) === null || _a3 === void 0 ? void 0 : _a3[0]) === null || _b === void 0 ? void 0 : _b.content;
+      const fullAutomaticFunctionCallingHistory = response.automaticFunctionCallingHistory;
+      const index = this.getHistory(true).length;
+      let automaticFunctionCallingHistory = [];
+      if (fullAutomaticFunctionCallingHistory != null) {
+        automaticFunctionCallingHistory = (_c = fullAutomaticFunctionCallingHistory.slice(index)) !== null && _c !== void 0 ? _c : [];
+      }
+      const modelOutput = outputContent ? [outputContent] : [];
+      this.recordHistory(inputContent, modelOutput, automaticFunctionCallingHistory);
+      return;
+    })();
+    await this.sendPromise.catch(() => {
+      this.sendPromise = Promise.resolve();
+    });
+    return responsePromise;
   }
   /**
    * Sends a message to the model and returns the response in chunks.
@@ -5153,21 +5124,19 @@ var Chat = class {
    * }
    * ```
    */
-  sendMessageStream(params) {
-    return __async(this, null, function* () {
-      var _a2;
-      yield this.sendPromise;
-      const inputContent = tContent(params.message);
-      const streamResponse = this.modelsModule.generateContentStream({
-        model: this.model,
-        contents: this.getHistory(true).concat(inputContent),
-        config: (_a2 = params.config) !== null && _a2 !== void 0 ? _a2 : this.config
-      });
-      this.sendPromise = streamResponse.then(() => void 0).catch(() => void 0);
-      const response = yield streamResponse;
-      const result = this.processStreamResponse(response, inputContent);
-      return result;
+  async sendMessageStream(params) {
+    var _a2;
+    await this.sendPromise;
+    const inputContent = tContent(params.message);
+    const streamResponse = this.modelsModule.generateContentStream({
+      model: this.model,
+      contents: this.getHistory(true).concat(inputContent),
+      config: (_a2 = params.config) !== null && _a2 !== void 0 ? _a2 : this.config
     });
+    this.sendPromise = streamResponse.then(() => void 0).catch(() => void 0);
+    const response = await streamResponse;
+    const result = this.processStreamResponse(response, inputContent);
+    return result;
   }
   /**
    * Returns the chat history.
@@ -5346,9 +5315,9 @@ var Files = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.list = (..._0) => __async(this, [..._0], function* (params = {}) {
-      return new Pager(PagedItem.PAGED_ITEM_FILES, (x) => this.listInternal(x), yield this.listInternal(params), params);
-    });
+    this.list = async (params = {}) => {
+      return new Pager(PagedItem.PAGED_ITEM_FILES, (x) => this.listInternal(x), await this.listInternal(params), params);
+    };
   }
   /**
    * Uploads a file asynchronously to the Gemini API.
@@ -5393,14 +5362,12 @@ var Files = class extends BaseModule {
    * console.log(file.name);
    * ```
    */
-  upload(params) {
-    return __async(this, null, function* () {
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("Vertex AI does not support uploading files. You can share files through a GCS bucket.");
-      }
-      return this.apiClient.uploadFile(params.file, params.config).then((resp) => {
-        return resp;
-      });
+  async upload(params) {
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("Vertex AI does not support uploading files. You can share files through a GCS bucket.");
+    }
+    return this.apiClient.uploadFile(params.file, params.config).then((resp) => {
+      return resp;
     });
   }
   /**
@@ -5419,82 +5386,76 @@ var Files = class extends BaseModule {
    * await ai.files.download({file: file.name, downloadPath: 'file.txt'});
    * ```
    */
-  download(params) {
-    return __async(this, null, function* () {
-      yield this.apiClient.downloadFile(params);
-    });
+  async download(params) {
+    await this.apiClient.downloadFile(params);
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = listFilesParametersToMldev(params);
-        path2 = formatMap("files", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async listInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = listFilesParametersToMldev(params);
+      path2 = formatMap("files", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = listFilesResponseFromMldev(apiResponse);
-          const typedResp = new ListFilesResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = listFilesResponseFromMldev(apiResponse);
+        const typedResp = new ListFilesResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
-  createInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = createFileParametersToMldev(params);
-        path2 = formatMap("upload/v1beta/files", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = createFileResponseFromMldev(apiResponse);
-          const typedResp = new CreateFileResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async createInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = createFileParametersToMldev(params);
+      path2 = formatMap("upload/v1beta/files", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = createFileResponseFromMldev(apiResponse);
+        const typedResp = new CreateFileResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Retrieves the file information from the service.
@@ -5511,35 +5472,33 @@ var Files = class extends BaseModule {
    * console.log(file.name);
    * ```
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = getFileParametersToMldev(params);
-        path2 = formatMap("files/{file}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = getFileParametersToMldev(params);
+      path2 = formatMap("files/{file}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Deletes a remotely stored file.
@@ -5554,44 +5513,42 @@ var Files = class extends BaseModule {
    * await ai.files.delete({name: file.name});
    * ```
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = deleteFileParametersToMldev(params);
-        path2 = formatMap("files/{file}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async delete(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = deleteFileParametersToMldev(params);
+      path2 = formatMap("files/{file}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = deleteFileResponseFromMldev(apiResponse);
-          const typedResp = new DeleteFileResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteFileResponseFromMldev(apiResponse);
+        const typedResp = new DeleteFileResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
 };
 function blobToMldev$2(fromObject) {
@@ -10043,12 +10000,10 @@ var ApiClient = class {
   getLocation() {
     return this.clientOptions.location;
   }
-  getAuthHeaders() {
-    return __async(this, null, function* () {
-      const headers = new Headers();
-      yield this.clientOptions.auth.addAuthHeaders(headers);
-      return headers;
-    });
+  async getAuthHeaders() {
+    const headers = new Headers();
+    await this.clientOptions.auth.addAuthHeaders(headers);
+    return headers;
   }
   getApiVersion() {
     if (this.clientOptions.httpOptions && this.clientOptions.httpOptions.apiVersion !== void 0) {
@@ -10128,30 +10083,28 @@ var ApiClient = class {
     }
     return true;
   }
-  request(request) {
-    return __async(this, null, function* () {
-      let patchedHttpOptions = this.clientOptions.httpOptions;
-      if (request.httpOptions) {
-        patchedHttpOptions = this.patchHttpOptions(this.clientOptions.httpOptions, request.httpOptions);
+  async request(request) {
+    let patchedHttpOptions = this.clientOptions.httpOptions;
+    if (request.httpOptions) {
+      patchedHttpOptions = this.patchHttpOptions(this.clientOptions.httpOptions, request.httpOptions);
+    }
+    const prependProjectLocation = this.shouldPrependVertexProjectPath(request);
+    const url = this.constructUrl(request.path, patchedHttpOptions, prependProjectLocation);
+    if (request.queryParams) {
+      for (const [key, value] of Object.entries(request.queryParams)) {
+        url.searchParams.append(key, String(value));
       }
-      const prependProjectLocation = this.shouldPrependVertexProjectPath(request);
-      const url = this.constructUrl(request.path, patchedHttpOptions, prependProjectLocation);
-      if (request.queryParams) {
-        for (const [key, value] of Object.entries(request.queryParams)) {
-          url.searchParams.append(key, String(value));
-        }
+    }
+    let requestInit = {};
+    if (request.httpMethod === "GET") {
+      if (request.body && request.body !== "{}") {
+        throw new Error("Request body should be empty for GET request, but got non empty request body");
       }
-      let requestInit = {};
-      if (request.httpMethod === "GET") {
-        if (request.body && request.body !== "{}") {
-          throw new Error("Request body should be empty for GET request, but got non empty request body");
-        }
-      } else {
-        requestInit.body = request.body;
-      }
-      requestInit = yield this.includeExtraHttpOptionsToRequestInit(requestInit, patchedHttpOptions, url.toString(), request.abortSignal);
-      return this.unaryApiCall(url, requestInit, request.httpMethod);
-    });
+    } else {
+      requestInit.body = request.body;
+    }
+    requestInit = await this.includeExtraHttpOptionsToRequestInit(requestInit, patchedHttpOptions, url.toString(), request.abortSignal);
+    return this.unaryApiCall(url, requestInit, request.httpMethod);
   }
   patchHttpOptions(baseHttpOptions, requestHttpOptions) {
     const patchedHttpOptions = JSON.parse(JSON.stringify(baseHttpOptions));
@@ -10164,74 +10117,66 @@ var ApiClient = class {
     }
     return patchedHttpOptions;
   }
-  requestStream(request) {
-    return __async(this, null, function* () {
-      let patchedHttpOptions = this.clientOptions.httpOptions;
-      if (request.httpOptions) {
-        patchedHttpOptions = this.patchHttpOptions(this.clientOptions.httpOptions, request.httpOptions);
+  async requestStream(request) {
+    let patchedHttpOptions = this.clientOptions.httpOptions;
+    if (request.httpOptions) {
+      patchedHttpOptions = this.patchHttpOptions(this.clientOptions.httpOptions, request.httpOptions);
+    }
+    const prependProjectLocation = this.shouldPrependVertexProjectPath(request);
+    const url = this.constructUrl(request.path, patchedHttpOptions, prependProjectLocation);
+    if (!url.searchParams.has("alt") || url.searchParams.get("alt") !== "sse") {
+      url.searchParams.set("alt", "sse");
+    }
+    let requestInit = {};
+    requestInit.body = request.body;
+    requestInit = await this.includeExtraHttpOptionsToRequestInit(requestInit, patchedHttpOptions, url.toString(), request.abortSignal);
+    return this.streamApiCall(url, requestInit, request.httpMethod);
+  }
+  async includeExtraHttpOptionsToRequestInit(requestInit, httpOptions, url, abortSignal) {
+    if (httpOptions && httpOptions.timeout || abortSignal) {
+      const abortController = new AbortController();
+      const signal = abortController.signal;
+      if (httpOptions.timeout && (httpOptions === null || httpOptions === void 0 ? void 0 : httpOptions.timeout) > 0) {
+        const timeoutHandle = setTimeout(() => abortController.abort(), httpOptions.timeout);
+        if (timeoutHandle && typeof timeoutHandle.unref === "function") {
+          timeoutHandle.unref();
+        }
       }
-      const prependProjectLocation = this.shouldPrependVertexProjectPath(request);
-      const url = this.constructUrl(request.path, patchedHttpOptions, prependProjectLocation);
-      if (!url.searchParams.has("alt") || url.searchParams.get("alt") !== "sse") {
-        url.searchParams.set("alt", "sse");
+      if (abortSignal) {
+        abortSignal.addEventListener("abort", () => {
+          abortController.abort();
+        });
       }
-      let requestInit = {};
-      requestInit.body = request.body;
-      requestInit = yield this.includeExtraHttpOptionsToRequestInit(requestInit, patchedHttpOptions, url.toString(), request.abortSignal);
-      return this.streamApiCall(url, requestInit, request.httpMethod);
+      requestInit.signal = signal;
+    }
+    if (httpOptions && httpOptions.extraBody !== null) {
+      includeExtraBodyToRequestInit(requestInit, httpOptions.extraBody);
+    }
+    requestInit.headers = await this.getHeadersInternal(httpOptions, url);
+    return requestInit;
+  }
+  async unaryApiCall(url, requestInit, httpMethod) {
+    return this.apiCall(url.toString(), Object.assign(Object.assign({}, requestInit), { method: httpMethod })).then(async (response) => {
+      await throwErrorIfNotOK(response);
+      return new HttpResponse(response);
+    }).catch((e) => {
+      if (e instanceof Error) {
+        throw e;
+      } else {
+        throw new Error(JSON.stringify(e));
+      }
     });
   }
-  includeExtraHttpOptionsToRequestInit(requestInit, httpOptions, url, abortSignal) {
-    return __async(this, null, function* () {
-      if (httpOptions && httpOptions.timeout || abortSignal) {
-        const abortController = new AbortController();
-        const signal = abortController.signal;
-        if (httpOptions.timeout && (httpOptions === null || httpOptions === void 0 ? void 0 : httpOptions.timeout) > 0) {
-          const timeoutHandle = setTimeout(() => abortController.abort(), httpOptions.timeout);
-          if (timeoutHandle && typeof timeoutHandle.unref === "function") {
-            timeoutHandle.unref();
-          }
-        }
-        if (abortSignal) {
-          abortSignal.addEventListener("abort", () => {
-            abortController.abort();
-          });
-        }
-        requestInit.signal = signal;
+  async streamApiCall(url, requestInit, httpMethod) {
+    return this.apiCall(url.toString(), Object.assign(Object.assign({}, requestInit), { method: httpMethod })).then(async (response) => {
+      await throwErrorIfNotOK(response);
+      return this.processStreamResponse(response);
+    }).catch((e) => {
+      if (e instanceof Error) {
+        throw e;
+      } else {
+        throw new Error(JSON.stringify(e));
       }
-      if (httpOptions && httpOptions.extraBody !== null) {
-        includeExtraBodyToRequestInit(requestInit, httpOptions.extraBody);
-      }
-      requestInit.headers = yield this.getHeadersInternal(httpOptions, url);
-      return requestInit;
-    });
-  }
-  unaryApiCall(url, requestInit, httpMethod) {
-    return __async(this, null, function* () {
-      return this.apiCall(url.toString(), Object.assign(Object.assign({}, requestInit), { method: httpMethod })).then((response) => __async(this, null, function* () {
-        yield throwErrorIfNotOK(response);
-        return new HttpResponse(response);
-      })).catch((e) => {
-        if (e instanceof Error) {
-          throw e;
-        } else {
-          throw new Error(JSON.stringify(e));
-        }
-      });
-    });
-  }
-  streamApiCall(url, requestInit, httpMethod) {
-    return __async(this, null, function* () {
-      return this.apiCall(url.toString(), Object.assign(Object.assign({}, requestInit), { method: httpMethod })).then((response) => __async(this, null, function* () {
-        yield throwErrorIfNotOK(response);
-        return this.processStreamResponse(response);
-      })).catch((e) => {
-        if (e instanceof Error) {
-          throw e;
-        } else {
-          throw new Error(JSON.stringify(e));
-        }
-      });
     });
   }
   processStreamResponse(response) {
@@ -10315,11 +10260,9 @@ var ApiClient = class {
       }
     });
   }
-  apiCall(url, requestInit) {
-    return __async(this, null, function* () {
-      return fetch(url, requestInit).catch((e) => {
-        throw new Error(`exception ${e} sending request`);
-      });
+  async apiCall(url, requestInit) {
+    return fetch(url, requestInit).catch((e) => {
+      throw new Error(`exception ${e} sending request`);
     });
   }
   getDefaultHeaders() {
@@ -10330,20 +10273,18 @@ var ApiClient = class {
     headers[CONTENT_TYPE_HEADER] = "application/json";
     return headers;
   }
-  getHeadersInternal(httpOptions, url) {
-    return __async(this, null, function* () {
-      const headers = new Headers();
-      if (httpOptions && httpOptions.headers) {
-        for (const [key, value] of Object.entries(httpOptions.headers)) {
-          headers.append(key, value);
-        }
-        if (httpOptions.timeout && httpOptions.timeout > 0) {
-          headers.append(SERVER_TIMEOUT_HEADER, String(Math.ceil(httpOptions.timeout / 1e3)));
-        }
+  async getHeadersInternal(httpOptions, url) {
+    const headers = new Headers();
+    if (httpOptions && httpOptions.headers) {
+      for (const [key, value] of Object.entries(httpOptions.headers)) {
+        headers.append(key, value);
       }
-      yield this.clientOptions.auth.addAuthHeaders(headers, url);
-      return headers;
-    });
+      if (httpOptions.timeout && httpOptions.timeout > 0) {
+        headers.append(SERVER_TIMEOUT_HEADER, String(Math.ceil(httpOptions.timeout / 1e3)));
+      }
+    }
+    await this.clientOptions.auth.addAuthHeaders(headers, url);
+    return headers;
   }
   getFileName(file) {
     var _a2;
@@ -10365,34 +10306,32 @@ var ApiClient = class {
    * @throws An error if called on a Vertex AI client.
    * @throws An error if the `mimeType` is not provided and can not be inferred,
    */
-  uploadFile(file, config) {
-    return __async(this, null, function* () {
-      var _a2;
-      const fileToUpload = {};
-      if (config != null) {
-        fileToUpload.mimeType = config.mimeType;
-        fileToUpload.name = config.name;
-        fileToUpload.displayName = config.displayName;
-      }
-      if (fileToUpload.name && !fileToUpload.name.startsWith("files/")) {
-        fileToUpload.name = `files/${fileToUpload.name}`;
-      }
-      const uploader = this.clientOptions.uploader;
-      const fileStat = yield uploader.stat(file);
-      fileToUpload.sizeBytes = String(fileStat.size);
-      const mimeType = (_a2 = config === null || config === void 0 ? void 0 : config.mimeType) !== null && _a2 !== void 0 ? _a2 : fileStat.type;
-      if (mimeType === void 0 || mimeType === "") {
-        throw new Error("Can not determine mimeType. Please provide mimeType in the config.");
-      }
-      fileToUpload.mimeType = mimeType;
-      const body = {
-        file: fileToUpload
-      };
-      const fileName = this.getFileName(file);
-      const path2 = formatMap("upload/v1beta/files", body["_url"]);
-      const uploadUrl = yield this.fetchUploadUrl(path2, fileToUpload.sizeBytes, fileToUpload.mimeType, fileName, body, config === null || config === void 0 ? void 0 : config.httpOptions);
-      return uploader.upload(file, uploadUrl, this);
-    });
+  async uploadFile(file, config) {
+    var _a2;
+    const fileToUpload = {};
+    if (config != null) {
+      fileToUpload.mimeType = config.mimeType;
+      fileToUpload.name = config.name;
+      fileToUpload.displayName = config.displayName;
+    }
+    if (fileToUpload.name && !fileToUpload.name.startsWith("files/")) {
+      fileToUpload.name = `files/${fileToUpload.name}`;
+    }
+    const uploader = this.clientOptions.uploader;
+    const fileStat = await uploader.stat(file);
+    fileToUpload.sizeBytes = String(fileStat.size);
+    const mimeType = (_a2 = config === null || config === void 0 ? void 0 : config.mimeType) !== null && _a2 !== void 0 ? _a2 : fileStat.type;
+    if (mimeType === void 0 || mimeType === "") {
+      throw new Error("Can not determine mimeType. Please provide mimeType in the config.");
+    }
+    fileToUpload.mimeType = mimeType;
+    const body = {
+      file: fileToUpload
+    };
+    const fileName = this.getFileName(file);
+    const path2 = formatMap("upload/v1beta/files", body["_url"]);
+    const uploadUrl = await this.fetchUploadUrl(path2, fileToUpload.sizeBytes, fileToUpload.mimeType, fileName, body, config === null || config === void 0 ? void 0 : config.httpOptions);
+    return uploader.upload(file, uploadUrl, this);
   }
   /**
    * Uploads a file to a given file search store asynchronously using Gemini API only, this is not supported
@@ -10406,25 +10345,23 @@ var ApiClient = class {
    * @throws An error if called on a Vertex AI client.
    * @throws An error if the `mimeType` is not provided and can not be inferred,
    */
-  uploadFileToFileSearchStore(fileSearchStoreName, file, config) {
-    return __async(this, null, function* () {
-      var _a2;
-      const uploader = this.clientOptions.uploader;
-      const fileStat = yield uploader.stat(file);
-      const sizeBytes = String(fileStat.size);
-      const mimeType = (_a2 = config === null || config === void 0 ? void 0 : config.mimeType) !== null && _a2 !== void 0 ? _a2 : fileStat.type;
-      if (mimeType === void 0 || mimeType === "") {
-        throw new Error("Can not determine mimeType. Please provide mimeType in the config.");
-      }
-      const path2 = `upload/v1beta/${fileSearchStoreName}:uploadToFileSearchStore`;
-      const fileName = this.getFileName(file);
-      const body = {};
-      if (config != null) {
-        uploadToFileSearchStoreConfigToMldev(config, body);
-      }
-      const uploadUrl = yield this.fetchUploadUrl(path2, sizeBytes, mimeType, fileName, body, config === null || config === void 0 ? void 0 : config.httpOptions);
-      return uploader.uploadToFileSearchStore(file, uploadUrl, this);
-    });
+  async uploadFileToFileSearchStore(fileSearchStoreName, file, config) {
+    var _a2;
+    const uploader = this.clientOptions.uploader;
+    const fileStat = await uploader.stat(file);
+    const sizeBytes = String(fileStat.size);
+    const mimeType = (_a2 = config === null || config === void 0 ? void 0 : config.mimeType) !== null && _a2 !== void 0 ? _a2 : fileStat.type;
+    if (mimeType === void 0 || mimeType === "") {
+      throw new Error("Can not determine mimeType. Please provide mimeType in the config.");
+    }
+    const path2 = `upload/v1beta/${fileSearchStoreName}:uploadToFileSearchStore`;
+    const fileName = this.getFileName(file);
+    const body = {};
+    if (config != null) {
+      uploadToFileSearchStoreConfigToMldev(config, body);
+    }
+    const uploadUrl = await this.fetchUploadUrl(path2, sizeBytes, mimeType, fileName, body, config === null || config === void 0 ? void 0 : config.httpOptions);
+    return uploader.uploadToFileSearchStore(file, uploadUrl, this);
   }
   /**
    * Downloads a file asynchronously to the specified path.
@@ -10432,73 +10369,67 @@ var ApiClient = class {
    * @params params - The parameters for the download request, see {@link
    * types.DownloadFileParameters}
    */
-  downloadFile(params) {
-    return __async(this, null, function* () {
-      const downloader = this.clientOptions.downloader;
-      yield downloader.download(params, this);
-    });
+  async downloadFile(params) {
+    const downloader = this.clientOptions.downloader;
+    await downloader.download(params, this);
   }
-  fetchUploadUrl(path2, sizeBytes, mimeType, fileName, body, configHttpOptions) {
-    return __async(this, null, function* () {
-      var _a2;
-      let httpOptions = {};
-      if (configHttpOptions) {
-        httpOptions = configHttpOptions;
-      } else {
-        httpOptions = {
-          apiVersion: "",
-          // api-version is set in the path.
-          headers: Object.assign({ "Content-Type": "application/json", "X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start", "X-Goog-Upload-Header-Content-Length": `${sizeBytes}`, "X-Goog-Upload-Header-Content-Type": `${mimeType}` }, fileName ? { "X-Goog-Upload-File-Name": fileName } : {})
-        };
-      }
-      const httpResponse = yield this.request({
-        path: path2,
-        body: JSON.stringify(body),
-        httpMethod: "POST",
-        httpOptions
-      });
-      if (!httpResponse || !(httpResponse === null || httpResponse === void 0 ? void 0 : httpResponse.headers)) {
-        throw new Error("Server did not return an HttpResponse or the returned HttpResponse did not have headers.");
-      }
-      const uploadUrl = (_a2 = httpResponse === null || httpResponse === void 0 ? void 0 : httpResponse.headers) === null || _a2 === void 0 ? void 0 : _a2["x-goog-upload-url"];
-      if (uploadUrl === void 0) {
-        throw new Error("Failed to get upload url. Server did not return the x-google-upload-url in the headers");
-      }
-      return uploadUrl;
+  async fetchUploadUrl(path2, sizeBytes, mimeType, fileName, body, configHttpOptions) {
+    var _a2;
+    let httpOptions = {};
+    if (configHttpOptions) {
+      httpOptions = configHttpOptions;
+    } else {
+      httpOptions = {
+        apiVersion: "",
+        // api-version is set in the path.
+        headers: Object.assign({ "Content-Type": "application/json", "X-Goog-Upload-Protocol": "resumable", "X-Goog-Upload-Command": "start", "X-Goog-Upload-Header-Content-Length": `${sizeBytes}`, "X-Goog-Upload-Header-Content-Type": `${mimeType}` }, fileName ? { "X-Goog-Upload-File-Name": fileName } : {})
+      };
+    }
+    const httpResponse = await this.request({
+      path: path2,
+      body: JSON.stringify(body),
+      httpMethod: "POST",
+      httpOptions
     });
+    if (!httpResponse || !(httpResponse === null || httpResponse === void 0 ? void 0 : httpResponse.headers)) {
+      throw new Error("Server did not return an HttpResponse or the returned HttpResponse did not have headers.");
+    }
+    const uploadUrl = (_a2 = httpResponse === null || httpResponse === void 0 ? void 0 : httpResponse.headers) === null || _a2 === void 0 ? void 0 : _a2["x-goog-upload-url"];
+    if (uploadUrl === void 0) {
+      throw new Error("Failed to get upload url. Server did not return the x-google-upload-url in the headers");
+    }
+    return uploadUrl;
   }
 };
-function throwErrorIfNotOK(response) {
-  return __async(this, null, function* () {
-    var _a2;
-    if (response === void 0) {
-      throw new Error("response is undefined");
+async function throwErrorIfNotOK(response) {
+  var _a2;
+  if (response === void 0) {
+    throw new Error("response is undefined");
+  }
+  if (!response.ok) {
+    const status = response.status;
+    let errorBody;
+    if ((_a2 = response.headers.get("content-type")) === null || _a2 === void 0 ? void 0 : _a2.includes("application/json")) {
+      errorBody = await response.json();
+    } else {
+      errorBody = {
+        error: {
+          message: await response.text(),
+          code: response.status,
+          status: response.statusText
+        }
+      };
     }
-    if (!response.ok) {
-      const status = response.status;
-      let errorBody;
-      if ((_a2 = response.headers.get("content-type")) === null || _a2 === void 0 ? void 0 : _a2.includes("application/json")) {
-        errorBody = yield response.json();
-      } else {
-        errorBody = {
-          error: {
-            message: yield response.text(),
-            code: response.status,
-            status: response.statusText
-          }
-        };
-      }
-      const errorMessage = JSON.stringify(errorBody);
-      if (status >= 400 && status < 600) {
-        const apiError = new ApiError({
-          message: errorMessage,
-          status
-        });
-        throw apiError;
-      }
-      throw new Error(errorMessage);
+    const errorMessage = JSON.stringify(errorBody);
+    if (status >= 400 && status < 600) {
+      const apiError = new ApiError({
+        message: errorMessage,
+        status
+      });
+      throw apiError;
     }
-  });
+    throw new Error(errorMessage);
+  }
 }
 function includeExtraBodyToRequestInit(requestInit, extraBody) {
   if (!extraBody || Object.keys(extraBody).length === 0) {
@@ -10602,80 +10533,74 @@ var McpCallableTool = class _McpCallableTool {
    * @throws {Error} if the MCP tools from the MCP clients have duplicate tool
    *     names.
    */
-  initialize() {
-    return __async(this, null, function* () {
-      var _a2, e_1, _b, _c;
-      if (this.mcpTools.length > 0) {
-        return;
-      }
-      const functionMap = {};
-      const mcpTools = [];
-      for (const mcpClient of this.mcpClients) {
+  async initialize() {
+    var _a2, e_1, _b, _c;
+    if (this.mcpTools.length > 0) {
+      return;
+    }
+    const functionMap = {};
+    const mcpTools = [];
+    for (const mcpClient of this.mcpClients) {
+      try {
+        for (var _d = true, _e = (e_1 = void 0, __asyncValues(listAllTools(mcpClient))), _f; _f = await _e.next(), _a2 = _f.done, !_a2; _d = true) {
+          _c = _f.value;
+          _d = false;
+          const mcpTool = _c;
+          mcpTools.push(mcpTool);
+          const mcpToolName = mcpTool.name;
+          if (functionMap[mcpToolName]) {
+            throw new Error(`Duplicate function name ${mcpToolName} found in MCP tools. Please ensure function names are unique.`);
+          }
+          functionMap[mcpToolName] = mcpClient;
+        }
+      } catch (e_1_1) {
+        e_1 = { error: e_1_1 };
+      } finally {
         try {
-          for (var _d = true, _e = (e_1 = void 0, __asyncValues(listAllTools(mcpClient))), _f; _f = yield _e.next(), _a2 = _f.done, !_a2; _d = true) {
-            _c = _f.value;
-            _d = false;
-            const mcpTool = _c;
-            mcpTools.push(mcpTool);
-            const mcpToolName = mcpTool.name;
-            if (functionMap[mcpToolName]) {
-              throw new Error(`Duplicate function name ${mcpToolName} found in MCP tools. Please ensure function names are unique.`);
-            }
-            functionMap[mcpToolName] = mcpClient;
-          }
-        } catch (e_1_1) {
-          e_1 = { error: e_1_1 };
+          if (!_d && !_a2 && (_b = _e.return)) await _b.call(_e);
         } finally {
-          try {
-            if (!_d && !_a2 && (_b = _e.return)) yield _b.call(_e);
-          } finally {
-            if (e_1) throw e_1.error;
-          }
+          if (e_1) throw e_1.error;
         }
       }
-      this.mcpTools = mcpTools;
-      this.functionNameToMcpClient = functionMap;
-    });
+    }
+    this.mcpTools = mcpTools;
+    this.functionNameToMcpClient = functionMap;
   }
-  tool() {
-    return __async(this, null, function* () {
-      yield this.initialize();
-      return mcpToolsToGeminiTool(this.mcpTools, this.config);
-    });
+  async tool() {
+    await this.initialize();
+    return mcpToolsToGeminiTool(this.mcpTools, this.config);
   }
-  callTool(functionCalls) {
-    return __async(this, null, function* () {
-      yield this.initialize();
-      const functionCallResponseParts = [];
-      for (const functionCall of functionCalls) {
-        if (functionCall.name in this.functionNameToMcpClient) {
-          const mcpClient = this.functionNameToMcpClient[functionCall.name];
-          let requestOptions = void 0;
-          if (this.config.timeout) {
-            requestOptions = {
-              timeout: this.config.timeout
-            };
-          }
-          const callToolResponse = yield mcpClient.callTool(
-            {
-              name: functionCall.name,
-              arguments: functionCall.args
-            },
-            // Set the result schema to undefined to allow MCP to rely on the
-            // default schema.
-            void 0,
-            requestOptions
-          );
-          functionCallResponseParts.push({
-            functionResponse: {
-              name: functionCall.name,
-              response: callToolResponse.isError ? { error: callToolResponse } : callToolResponse
-            }
-          });
+  async callTool(functionCalls) {
+    await this.initialize();
+    const functionCallResponseParts = [];
+    for (const functionCall of functionCalls) {
+      if (functionCall.name in this.functionNameToMcpClient) {
+        const mcpClient = this.functionNameToMcpClient[functionCall.name];
+        let requestOptions = void 0;
+        if (this.config.timeout) {
+          requestOptions = {
+            timeout: this.config.timeout
+          };
         }
+        const callToolResponse = await mcpClient.callTool(
+          {
+            name: functionCall.name,
+            arguments: functionCall.args
+          },
+          // Set the result schema to undefined to allow MCP to rely on the
+          // default schema.
+          void 0,
+          requestOptions
+        );
+        functionCallResponseParts.push({
+          functionResponse: {
+            name: functionCall.name,
+            response: callToolResponse.isError ? { error: callToolResponse } : callToolResponse
+          }
+        });
       }
-      return functionCallResponseParts;
-    });
+    }
+    return functionCallResponseParts;
   }
 };
 function isMcpClient(client) {
@@ -10692,18 +10617,16 @@ function mcpToTool(...args) {
   }
   return McpCallableTool.create(args.slice(0, args.length - 1), maybeConfig);
 }
-function handleWebSocketMessage$1(apiClient, onmessage, event) {
-  return __async(this, null, function* () {
-    const serverMessage = new LiveMusicServerMessage();
-    let data;
-    if (event.data instanceof Blob) {
-      data = JSON.parse(yield event.data.text());
-    } else {
-      data = JSON.parse(event.data);
-    }
-    Object.assign(serverMessage, data);
-    onmessage(serverMessage);
-  });
+async function handleWebSocketMessage$1(apiClient, onmessage, event) {
+  const serverMessage = new LiveMusicServerMessage();
+  let data;
+  if (event.data instanceof Blob) {
+    data = JSON.parse(await event.data.text());
+  } else {
+    data = JSON.parse(event.data);
+  }
+  Object.assign(serverMessage, data);
+  onmessage(serverMessage);
 }
 var LiveMusic = class {
   constructor(apiClient, auth, webSocketFactory) {
@@ -10741,47 +10664,45 @@ var LiveMusic = class {
        });
        ```
       */
-  connect(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("Live music is not supported for Vertex AI.");
-      }
-      console.warn("Live music generation is experimental and may change in future versions.");
-      const websocketBaseUrl = this.apiClient.getWebsocketBaseUrl();
-      const apiVersion = this.apiClient.getApiVersion();
-      const headers = mapToHeaders$1(this.apiClient.getDefaultHeaders());
-      const apiKey = this.apiClient.getApiKey();
-      const url = `${websocketBaseUrl}/ws/google.ai.generativelanguage.${apiVersion}.GenerativeService.BidiGenerateMusic?key=${apiKey}`;
-      let onopenResolve = () => {
-      };
-      const onopenPromise = new Promise((resolve) => {
-        onopenResolve = resolve;
-      });
-      const callbacks = params.callbacks;
-      const onopenAwaitedCallback = function() {
-        onopenResolve({});
-      };
-      const apiClient = this.apiClient;
-      const websocketCallbacks = {
-        onopen: onopenAwaitedCallback,
-        onmessage: (event) => {
-          void handleWebSocketMessage$1(apiClient, callbacks.onmessage, event);
-        },
-        onerror: (_a2 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onerror) !== null && _a2 !== void 0 ? _a2 : function(e) {
-        },
-        onclose: (_b = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onclose) !== null && _b !== void 0 ? _b : function(e) {
-        }
-      };
-      const conn = this.webSocketFactory.create(url, headersToMap$1(headers), websocketCallbacks);
-      conn.connect();
-      yield onopenPromise;
-      const model = tModel(this.apiClient, params.model);
-      const setup = { model };
-      const clientMessage = { setup };
-      conn.send(JSON.stringify(clientMessage));
-      return new LiveMusicSession(conn, this.apiClient);
+  async connect(params) {
+    var _a2, _b;
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("Live music is not supported for Vertex AI.");
+    }
+    console.warn("Live music generation is experimental and may change in future versions.");
+    const websocketBaseUrl = this.apiClient.getWebsocketBaseUrl();
+    const apiVersion = this.apiClient.getApiVersion();
+    const headers = mapToHeaders$1(this.apiClient.getDefaultHeaders());
+    const apiKey = this.apiClient.getApiKey();
+    const url = `${websocketBaseUrl}/ws/google.ai.generativelanguage.${apiVersion}.GenerativeService.BidiGenerateMusic?key=${apiKey}`;
+    let onopenResolve = () => {
+    };
+    const onopenPromise = new Promise((resolve) => {
+      onopenResolve = resolve;
     });
+    const callbacks = params.callbacks;
+    const onopenAwaitedCallback = function() {
+      onopenResolve({});
+    };
+    const apiClient = this.apiClient;
+    const websocketCallbacks = {
+      onopen: onopenAwaitedCallback,
+      onmessage: (event) => {
+        void handleWebSocketMessage$1(apiClient, callbacks.onmessage, event);
+      },
+      onerror: (_a2 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onerror) !== null && _a2 !== void 0 ? _a2 : function(e) {
+      },
+      onclose: (_b = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onclose) !== null && _b !== void 0 ? _b : function(e) {
+      }
+    };
+    const conn = this.webSocketFactory.create(url, headersToMap$1(headers), websocketCallbacks);
+    conn.connect();
+    await onopenPromise;
+    const model = tModel(this.apiClient, params.model);
+    const setup = { model };
+    const clientMessage = { setup };
+    conn.send(JSON.stringify(clientMessage));
+    return new LiveMusicSession(conn, this.apiClient);
   }
 };
 var LiveMusicSession = class {
@@ -10800,14 +10721,12 @@ var LiveMusicSession = class {
   
       @experimental
      */
-  setWeightedPrompts(params) {
-    return __async(this, null, function* () {
-      if (!params.weightedPrompts || Object.keys(params.weightedPrompts).length === 0) {
-        throw new Error("Weighted prompts must be set and contain at least one entry.");
-      }
-      const clientContent = liveMusicSetWeightedPromptsParametersToMldev(params);
-      this.conn.send(JSON.stringify({ clientContent }));
-    });
+  async setWeightedPrompts(params) {
+    if (!params.weightedPrompts || Object.keys(params.weightedPrompts).length === 0) {
+      throw new Error("Weighted prompts must be set and contain at least one entry.");
+    }
+    const clientContent = liveMusicSetWeightedPromptsParametersToMldev(params);
+    this.conn.send(JSON.stringify({ clientContent }));
   }
   /**
       Sets a configuration to the model. Updates the session's current
@@ -10820,14 +10739,12 @@ var LiveMusicSession = class {
   
       @experimental
      */
-  setMusicGenerationConfig(params) {
-    return __async(this, null, function* () {
-      if (!params.musicGenerationConfig) {
-        params.musicGenerationConfig = {};
-      }
-      const setConfigParameters = liveMusicSetConfigParametersToMldev(params);
-      this.conn.send(JSON.stringify(setConfigParameters));
-    });
+  async setMusicGenerationConfig(params) {
+    if (!params.musicGenerationConfig) {
+      params.musicGenerationConfig = {};
+    }
+    const setConfigParameters = liveMusicSetConfigParametersToMldev(params);
+    this.conn.send(JSON.stringify(setConfigParameters));
   }
   sendPlaybackControl(playbackControl) {
     const clientMessage = { playbackControl };
@@ -10892,27 +10809,25 @@ function mapToHeaders$1(map) {
   return headers;
 }
 var FUNCTION_RESPONSE_REQUIRES_ID = "FunctionResponse request must have an `id` field from the response of a ToolCall.FunctionalCalls in Google AI.";
-function handleWebSocketMessage(apiClient, onmessage, event) {
-  return __async(this, null, function* () {
-    const serverMessage = new LiveServerMessage();
-    let jsonData;
-    if (event.data instanceof Blob) {
-      jsonData = yield event.data.text();
-    } else if (event.data instanceof ArrayBuffer) {
-      jsonData = new TextDecoder().decode(event.data);
-    } else {
-      jsonData = event.data;
-    }
-    const data = JSON.parse(jsonData);
-    if (apiClient.isVertexAI()) {
-      const resp = liveServerMessageFromVertex(data);
-      Object.assign(serverMessage, resp);
-    } else {
-      const resp = data;
-      Object.assign(serverMessage, resp);
-    }
-    onmessage(serverMessage);
-  });
+async function handleWebSocketMessage(apiClient, onmessage, event) {
+  const serverMessage = new LiveServerMessage();
+  let jsonData;
+  if (event.data instanceof Blob) {
+    jsonData = await event.data.text();
+  } else if (event.data instanceof ArrayBuffer) {
+    jsonData = new TextDecoder().decode(event.data);
+  } else {
+    jsonData = event.data;
+  }
+  const data = JSON.parse(jsonData);
+  if (apiClient.isVertexAI()) {
+    const resp = liveServerMessageFromVertex(data);
+    Object.assign(serverMessage, resp);
+  } else {
+    const resp = data;
+    Object.assign(serverMessage, resp);
+  }
+  onmessage(serverMessage);
 }
 var Live = class {
   constructor(apiClient, auth, webSocketFactory) {
@@ -10963,106 +10878,104 @@ var Live = class {
        });
        ```
       */
-  connect(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d, _e, _f;
-      if (params.config && params.config.httpOptions) {
-        throw new Error("The Live module does not support httpOptions at request-level in LiveConnectConfig yet. Please use the client-level httpOptions configuration instead.");
-      }
-      const websocketBaseUrl = this.apiClient.getWebsocketBaseUrl();
-      const apiVersion = this.apiClient.getApiVersion();
-      let url;
-      const clientHeaders = this.apiClient.getHeaders();
-      if (params.config && params.config.tools && hasMcpToolUsage(params.config.tools)) {
-        setMcpUsageHeader(clientHeaders);
-      }
-      const headers = mapToHeaders(clientHeaders);
-      if (this.apiClient.isVertexAI()) {
-        url = `${websocketBaseUrl}/ws/google.cloud.aiplatform.${apiVersion}.LlmBidiService/BidiGenerateContent`;
-        yield this.auth.addAuthHeaders(headers, url);
-      } else {
-        const apiKey = this.apiClient.getApiKey();
-        let method = "BidiGenerateContent";
-        let keyName = "key";
-        if (apiKey === null || apiKey === void 0 ? void 0 : apiKey.startsWith("auth_tokens/")) {
-          console.warn("Warning: Ephemeral token support is experimental and may change in future versions.");
-          if (apiVersion !== "v1alpha") {
-            console.warn("Warning: The SDK's ephemeral token support is in v1alpha only. Please use const ai = new GoogleGenAI({apiKey: token.name, httpOptions: { apiVersion: 'v1alpha' }}); before session connection.");
-          }
-          method = "BidiGenerateContentConstrained";
-          keyName = "access_token";
+  async connect(params) {
+    var _a2, _b, _c, _d, _e, _f;
+    if (params.config && params.config.httpOptions) {
+      throw new Error("The Live module does not support httpOptions at request-level in LiveConnectConfig yet. Please use the client-level httpOptions configuration instead.");
+    }
+    const websocketBaseUrl = this.apiClient.getWebsocketBaseUrl();
+    const apiVersion = this.apiClient.getApiVersion();
+    let url;
+    const clientHeaders = this.apiClient.getHeaders();
+    if (params.config && params.config.tools && hasMcpToolUsage(params.config.tools)) {
+      setMcpUsageHeader(clientHeaders);
+    }
+    const headers = mapToHeaders(clientHeaders);
+    if (this.apiClient.isVertexAI()) {
+      url = `${websocketBaseUrl}/ws/google.cloud.aiplatform.${apiVersion}.LlmBidiService/BidiGenerateContent`;
+      await this.auth.addAuthHeaders(headers, url);
+    } else {
+      const apiKey = this.apiClient.getApiKey();
+      let method = "BidiGenerateContent";
+      let keyName = "key";
+      if (apiKey === null || apiKey === void 0 ? void 0 : apiKey.startsWith("auth_tokens/")) {
+        console.warn("Warning: Ephemeral token support is experimental and may change in future versions.");
+        if (apiVersion !== "v1alpha") {
+          console.warn("Warning: The SDK's ephemeral token support is in v1alpha only. Please use const ai = new GoogleGenAI({apiKey: token.name, httpOptions: { apiVersion: 'v1alpha' }}); before session connection.");
         }
-        url = `${websocketBaseUrl}/ws/google.ai.generativelanguage.${apiVersion}.GenerativeService.${method}?${keyName}=${apiKey}`;
+        method = "BidiGenerateContentConstrained";
+        keyName = "access_token";
       }
-      let onopenResolve = () => {
-      };
-      const onopenPromise = new Promise((resolve) => {
-        onopenResolve = resolve;
-      });
-      const callbacks = params.callbacks;
-      const onopenAwaitedCallback = function() {
-        var _a3;
-        (_a3 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onopen) === null || _a3 === void 0 ? void 0 : _a3.call(callbacks);
-        onopenResolve({});
-      };
-      const apiClient = this.apiClient;
-      const websocketCallbacks = {
-        onopen: onopenAwaitedCallback,
-        onmessage: (event) => {
-          void handleWebSocketMessage(apiClient, callbacks.onmessage, event);
-        },
-        onerror: (_a2 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onerror) !== null && _a2 !== void 0 ? _a2 : function(e) {
-        },
-        onclose: (_b = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onclose) !== null && _b !== void 0 ? _b : function(e) {
-        }
-      };
-      const conn = this.webSocketFactory.create(url, headersToMap(headers), websocketCallbacks);
-      conn.connect();
-      yield onopenPromise;
-      let transformedModel = tModel(this.apiClient, params.model);
-      if (this.apiClient.isVertexAI() && transformedModel.startsWith("publishers/")) {
-        const project = this.apiClient.getProject();
-        const location = this.apiClient.getLocation();
-        transformedModel = `projects/${project}/locations/${location}/` + transformedModel;
-      }
-      let clientMessage = {};
-      if (this.apiClient.isVertexAI() && ((_c = params.config) === null || _c === void 0 ? void 0 : _c.responseModalities) === void 0) {
-        if (params.config === void 0) {
-          params.config = { responseModalities: [Modality.AUDIO] };
-        } else {
-          params.config.responseModalities = [Modality.AUDIO];
-        }
-      }
-      if ((_d = params.config) === null || _d === void 0 ? void 0 : _d.generationConfig) {
-        console.warn("Setting `LiveConnectConfig.generation_config` is deprecated, please set the fields on `LiveConnectConfig` directly. This will become an error in a future version (not before Q3 2025).");
-      }
-      const inputTools = (_f = (_e = params.config) === null || _e === void 0 ? void 0 : _e.tools) !== null && _f !== void 0 ? _f : [];
-      const convertedTools = [];
-      for (const tool of inputTools) {
-        if (this.isCallableTool(tool)) {
-          const callableTool = tool;
-          convertedTools.push(yield callableTool.tool());
-        } else {
-          convertedTools.push(tool);
-        }
-      }
-      if (convertedTools.length > 0) {
-        params.config.tools = convertedTools;
-      }
-      const liveConnectParameters = {
-        model: transformedModel,
-        config: params.config,
-        callbacks: params.callbacks
-      };
-      if (this.apiClient.isVertexAI()) {
-        clientMessage = liveConnectParametersToVertex(this.apiClient, liveConnectParameters);
-      } else {
-        clientMessage = liveConnectParametersToMldev(this.apiClient, liveConnectParameters);
-      }
-      delete clientMessage["config"];
-      conn.send(JSON.stringify(clientMessage));
-      return new Session(conn, this.apiClient);
+      url = `${websocketBaseUrl}/ws/google.ai.generativelanguage.${apiVersion}.GenerativeService.${method}?${keyName}=${apiKey}`;
+    }
+    let onopenResolve = () => {
+    };
+    const onopenPromise = new Promise((resolve) => {
+      onopenResolve = resolve;
     });
+    const callbacks = params.callbacks;
+    const onopenAwaitedCallback = function() {
+      var _a3;
+      (_a3 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onopen) === null || _a3 === void 0 ? void 0 : _a3.call(callbacks);
+      onopenResolve({});
+    };
+    const apiClient = this.apiClient;
+    const websocketCallbacks = {
+      onopen: onopenAwaitedCallback,
+      onmessage: (event) => {
+        void handleWebSocketMessage(apiClient, callbacks.onmessage, event);
+      },
+      onerror: (_a2 = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onerror) !== null && _a2 !== void 0 ? _a2 : function(e) {
+      },
+      onclose: (_b = callbacks === null || callbacks === void 0 ? void 0 : callbacks.onclose) !== null && _b !== void 0 ? _b : function(e) {
+      }
+    };
+    const conn = this.webSocketFactory.create(url, headersToMap(headers), websocketCallbacks);
+    conn.connect();
+    await onopenPromise;
+    let transformedModel = tModel(this.apiClient, params.model);
+    if (this.apiClient.isVertexAI() && transformedModel.startsWith("publishers/")) {
+      const project = this.apiClient.getProject();
+      const location = this.apiClient.getLocation();
+      transformedModel = `projects/${project}/locations/${location}/` + transformedModel;
+    }
+    let clientMessage = {};
+    if (this.apiClient.isVertexAI() && ((_c = params.config) === null || _c === void 0 ? void 0 : _c.responseModalities) === void 0) {
+      if (params.config === void 0) {
+        params.config = { responseModalities: [Modality.AUDIO] };
+      } else {
+        params.config.responseModalities = [Modality.AUDIO];
+      }
+    }
+    if ((_d = params.config) === null || _d === void 0 ? void 0 : _d.generationConfig) {
+      console.warn("Setting `LiveConnectConfig.generation_config` is deprecated, please set the fields on `LiveConnectConfig` directly. This will become an error in a future version (not before Q3 2025).");
+    }
+    const inputTools = (_f = (_e = params.config) === null || _e === void 0 ? void 0 : _e.tools) !== null && _f !== void 0 ? _f : [];
+    const convertedTools = [];
+    for (const tool of inputTools) {
+      if (this.isCallableTool(tool)) {
+        const callableTool = tool;
+        convertedTools.push(await callableTool.tool());
+      } else {
+        convertedTools.push(tool);
+      }
+    }
+    if (convertedTools.length > 0) {
+      params.config.tools = convertedTools;
+    }
+    const liveConnectParameters = {
+      model: transformedModel,
+      config: params.config,
+      callbacks: params.callbacks
+    };
+    if (this.apiClient.isVertexAI()) {
+      clientMessage = liveConnectParametersToVertex(this.apiClient, liveConnectParameters);
+    } else {
+      clientMessage = liveConnectParametersToMldev(this.apiClient, liveConnectParameters);
+    }
+    delete clientMessage["config"];
+    conn.send(JSON.stringify(clientMessage));
+    return new Session(conn, this.apiClient);
   }
   // TODO: b/416041229 - Abstract this method to a common place.
   isCallableTool(tool) {
@@ -11328,12 +11241,12 @@ var Models = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.generateContent = (params) => __async(this, null, function* () {
+    this.generateContent = async (params) => {
       var _a2, _b, _c, _d, _e;
-      const transformedParams = yield this.processParamsMaybeAddMcpUsage(params);
+      const transformedParams = await this.processParamsMaybeAddMcpUsage(params);
       this.maybeMoveToResponseJsonSchem(params);
       if (!hasCallableTools(params) || shouldDisableAfc(params.config)) {
-        return yield this.generateContentInternal(transformedParams);
+        return await this.generateContentInternal(transformedParams);
       }
       const incompatibleToolIndexes = findAfcIncompatibleToolIndexes(params);
       if (incompatibleToolIndexes.length > 0) {
@@ -11346,7 +11259,7 @@ var Models = class extends BaseModule {
       const maxRemoteCalls = (_c = (_b = (_a2 = transformedParams.config) === null || _a2 === void 0 ? void 0 : _a2.automaticFunctionCalling) === null || _b === void 0 ? void 0 : _b.maximumRemoteCalls) !== null && _c !== void 0 ? _c : DEFAULT_MAX_REMOTE_CALLS;
       let remoteCalls = 0;
       while (remoteCalls < maxRemoteCalls) {
-        response = yield this.generateContentInternal(transformedParams);
+        response = await this.generateContentInternal(transformedParams);
         if (!response.functionCalls || response.functionCalls.length === 0) {
           break;
         }
@@ -11355,7 +11268,7 @@ var Models = class extends BaseModule {
         for (const tool of (_e = (_d = params.config) === null || _d === void 0 ? void 0 : _d.tools) !== null && _e !== void 0 ? _e : []) {
           if (isCallableTool(tool)) {
             const callableTool = tool;
-            const parts = yield callableTool.callTool(response.functionCalls);
+            const parts = await callableTool.callTool(response.functionCalls);
             functionResponseParts.push(...parts);
           }
         }
@@ -11376,13 +11289,13 @@ var Models = class extends BaseModule {
         response.automaticFunctionCallingHistory = automaticFunctionCallingHistory;
       }
       return response;
-    });
-    this.generateContentStream = (params) => __async(this, null, function* () {
+    };
+    this.generateContentStream = async (params) => {
       var _a2, _b, _c, _d, _e;
       this.maybeMoveToResponseJsonSchem(params);
       if (shouldDisableAfc(params.config)) {
-        const transformedParams = yield this.processParamsMaybeAddMcpUsage(params);
-        return yield this.generateContentStreamInternal(transformedParams);
+        const transformedParams = await this.processParamsMaybeAddMcpUsage(params);
+        return await this.generateContentStreamInternal(transformedParams);
       }
       const incompatibleToolIndexes = findAfcIncompatibleToolIndexes(params);
       if (incompatibleToolIndexes.length > 0) {
@@ -11394,10 +11307,10 @@ var Models = class extends BaseModule {
       if (streamFunctionCall && !disableAfc) {
         throw new Error("Running in streaming mode with 'streamFunctionCallArguments' enabled, this feature is not compatible with automatic function calling (AFC). Please set 'config.automaticFunctionCalling.disable' to true to disable AFC or leave 'config.toolConfig.functionCallingConfig.streamFunctionCallArguments' to be undefined or set to false to disable streaming function call arguments feature.");
       }
-      return yield this.processAfcStream(params);
-    });
-    this.generateImages = (params) => __async(this, null, function* () {
-      return yield this.generateImagesInternal(params).then((apiResponse) => {
+      return await this.processAfcStream(params);
+    };
+    this.generateImages = async (params) => {
+      return await this.generateImagesInternal(params).then((apiResponse) => {
         var _a2;
         let positivePromptSafetyAttributes;
         const generatedImages = [];
@@ -11425,8 +11338,8 @@ var Models = class extends BaseModule {
         }
         return response;
       });
-    });
-    this.list = (params) => __async(this, null, function* () {
+    };
+    this.list = async (params) => {
       var _a2;
       const defaultConfig = {
         queryBase: true
@@ -11444,9 +11357,9 @@ var Models = class extends BaseModule {
           }
         }
       }
-      return new Pager(PagedItem.PAGED_ITEM_MODELS, (x) => this.listInternal(x), yield this.listInternal(actualParams), actualParams);
-    });
-    this.editImage = (params) => __async(this, null, function* () {
+      return new Pager(PagedItem.PAGED_ITEM_MODELS, (x) => this.listInternal(x), await this.listInternal(actualParams), actualParams);
+    };
+    this.editImage = async (params) => {
       const paramsInternal = {
         model: params.model,
         prompt: params.prompt,
@@ -11458,9 +11371,9 @@ var Models = class extends BaseModule {
           paramsInternal.referenceImages = params.referenceImages.map((img) => img.toReferenceImageAPI());
         }
       }
-      return yield this.editImageInternal(paramsInternal);
-    });
-    this.upscaleImage = (params) => __async(this, null, function* () {
+      return await this.editImageInternal(paramsInternal);
+    };
+    this.upscaleImage = async (params) => {
       let apiConfig = {
         numberOfImages: 1,
         mode: "upscale"
@@ -11474,9 +11387,9 @@ var Models = class extends BaseModule {
         upscaleFactor: params.upscaleFactor,
         config: apiConfig
       };
-      return yield this.upscaleImageInternal(apiParams);
-    });
-    this.generateVideos = (params) => __async(this, null, function* () {
+      return await this.upscaleImageInternal(apiParams);
+    };
+    this.generateVideos = async (params) => {
       var _a2, _b, _c, _d, _e, _f;
       if ((params.prompt || params.image || params.video) && params.source) {
         throw new Error("Source and prompt/image/video are mutually exclusive. Please only use source.");
@@ -11494,8 +11407,8 @@ var Models = class extends BaseModule {
           };
         }
       }
-      return yield this.generateVideosInternal(params);
-    });
+      return await this.generateVideosInternal(params);
+    };
   }
   /**
    * This logic is needed for GenerateContentConfig only.
@@ -11521,297 +11434,287 @@ var Models = class extends BaseModule {
    * modify the original params. Also sets the MCP usage header if there are
    * MCP tools in the parameters.
    */
-  processParamsMaybeAddMcpUsage(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c;
-      const tools = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.tools;
-      if (!tools) {
-        return params;
+  async processParamsMaybeAddMcpUsage(params) {
+    var _a2, _b, _c;
+    const tools = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.tools;
+    if (!tools) {
+      return params;
+    }
+    const transformedTools = await Promise.all(tools.map(async (tool) => {
+      if (isCallableTool(tool)) {
+        const callableTool = tool;
+        return await callableTool.tool();
       }
-      const transformedTools = yield Promise.all(tools.map((tool) => __async(null, null, function* () {
-        if (isCallableTool(tool)) {
-          const callableTool = tool;
-          return yield callableTool.tool();
-        }
-        return tool;
-      })));
-      const newParams = {
-        model: params.model,
-        contents: params.contents,
-        config: Object.assign(Object.assign({}, params.config), { tools: transformedTools })
-      };
-      newParams.config.tools = transformedTools;
-      if (params.config && params.config.tools && hasMcpToolUsage(params.config.tools)) {
-        const headers = (_c = (_b = params.config.httpOptions) === null || _b === void 0 ? void 0 : _b.headers) !== null && _c !== void 0 ? _c : {};
-        let newHeaders = Object.assign({}, headers);
-        if (Object.keys(newHeaders).length === 0) {
-          newHeaders = this.apiClient.getDefaultHeaders();
-        }
-        setMcpUsageHeader(newHeaders);
-        newParams.config.httpOptions = Object.assign(Object.assign({}, params.config.httpOptions), { headers: newHeaders });
+      return tool;
+    }));
+    const newParams = {
+      model: params.model,
+      contents: params.contents,
+      config: Object.assign(Object.assign({}, params.config), { tools: transformedTools })
+    };
+    newParams.config.tools = transformedTools;
+    if (params.config && params.config.tools && hasMcpToolUsage(params.config.tools)) {
+      const headers = (_c = (_b = params.config.httpOptions) === null || _b === void 0 ? void 0 : _b.headers) !== null && _c !== void 0 ? _c : {};
+      let newHeaders = Object.assign({}, headers);
+      if (Object.keys(newHeaders).length === 0) {
+        newHeaders = this.apiClient.getDefaultHeaders();
       }
-      return newParams;
-    });
+      setMcpUsageHeader(newHeaders);
+      newParams.config.httpOptions = Object.assign(Object.assign({}, params.config.httpOptions), { headers: newHeaders });
+    }
+    return newParams;
   }
-  initAfcToolsMap(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c;
-      const afcTools = /* @__PURE__ */ new Map();
-      for (const tool of (_b = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.tools) !== null && _b !== void 0 ? _b : []) {
-        if (isCallableTool(tool)) {
-          const callableTool = tool;
-          const toolDeclaration = yield callableTool.tool();
-          for (const declaration of (_c = toolDeclaration.functionDeclarations) !== null && _c !== void 0 ? _c : []) {
-            if (!declaration.name) {
-              throw new Error("Function declaration name is required.");
-            }
-            if (afcTools.has(declaration.name)) {
-              throw new Error(`Duplicate tool declaration name: ${declaration.name}`);
-            }
-            afcTools.set(declaration.name, callableTool);
+  async initAfcToolsMap(params) {
+    var _a2, _b, _c;
+    const afcTools = /* @__PURE__ */ new Map();
+    for (const tool of (_b = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.tools) !== null && _b !== void 0 ? _b : []) {
+      if (isCallableTool(tool)) {
+        const callableTool = tool;
+        const toolDeclaration = await callableTool.tool();
+        for (const declaration of (_c = toolDeclaration.functionDeclarations) !== null && _c !== void 0 ? _c : []) {
+          if (!declaration.name) {
+            throw new Error("Function declaration name is required.");
           }
+          if (afcTools.has(declaration.name)) {
+            throw new Error(`Duplicate tool declaration name: ${declaration.name}`);
+          }
+          afcTools.set(declaration.name, callableTool);
         }
       }
-      return afcTools;
-    });
+    }
+    return afcTools;
   }
-  processAfcStream(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c;
-      const maxRemoteCalls = (_c = (_b = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.automaticFunctionCalling) === null || _b === void 0 ? void 0 : _b.maximumRemoteCalls) !== null && _c !== void 0 ? _c : DEFAULT_MAX_REMOTE_CALLS;
-      let wereFunctionsCalled = false;
-      let remoteCallCount = 0;
-      const afcToolsMap = yield this.initAfcToolsMap(params);
-      return (function(models, afcTools, params2) {
-        return __asyncGenerator(this, arguments, function* () {
-          var _a3, e_1, _b2, _c2;
-          var _d, _e;
-          while (remoteCallCount < maxRemoteCalls) {
-            if (wereFunctionsCalled) {
-              remoteCallCount++;
-              wereFunctionsCalled = false;
-            }
-            const transformedParams = yield __await(models.processParamsMaybeAddMcpUsage(params2));
-            const response = yield __await(models.generateContentStreamInternal(transformedParams));
-            const functionResponses = [];
-            const responseContents = [];
-            try {
-              for (var _f = true, response_1 = (e_1 = void 0, __asyncValues(response)), response_1_1; response_1_1 = yield __await(response_1.next()), _a3 = response_1_1.done, !_a3; _f = true) {
-                _c2 = response_1_1.value;
-                _f = false;
-                const chunk = _c2;
-                yield yield __await(chunk);
-                if (chunk.candidates && ((_d = chunk.candidates[0]) === null || _d === void 0 ? void 0 : _d.content)) {
-                  responseContents.push(chunk.candidates[0].content);
-                  for (const part of (_e = chunk.candidates[0].content.parts) !== null && _e !== void 0 ? _e : []) {
-                    if (remoteCallCount < maxRemoteCalls && part.functionCall) {
-                      if (!part.functionCall.name) {
-                        throw new Error("Function call name was not returned by the model.");
-                      }
-                      if (!afcTools.has(part.functionCall.name)) {
-                        throw new Error(`Automatic function calling was requested, but not all the tools the model used implement the CallableTool interface. Available tools: ${afcTools.keys()}, mising tool: ${part.functionCall.name}`);
-                      } else {
-                        const responseParts = yield __await(afcTools.get(part.functionCall.name).callTool([part.functionCall]));
-                        functionResponses.push(...responseParts);
-                      }
+  async processAfcStream(params) {
+    var _a2, _b, _c;
+    const maxRemoteCalls = (_c = (_b = (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.automaticFunctionCalling) === null || _b === void 0 ? void 0 : _b.maximumRemoteCalls) !== null && _c !== void 0 ? _c : DEFAULT_MAX_REMOTE_CALLS;
+    let wereFunctionsCalled = false;
+    let remoteCallCount = 0;
+    const afcToolsMap = await this.initAfcToolsMap(params);
+    return (function(models, afcTools, params2) {
+      return __asyncGenerator(this, arguments, function* () {
+        var _a3, e_1, _b2, _c2;
+        var _d, _e;
+        while (remoteCallCount < maxRemoteCalls) {
+          if (wereFunctionsCalled) {
+            remoteCallCount++;
+            wereFunctionsCalled = false;
+          }
+          const transformedParams = yield __await(models.processParamsMaybeAddMcpUsage(params2));
+          const response = yield __await(models.generateContentStreamInternal(transformedParams));
+          const functionResponses = [];
+          const responseContents = [];
+          try {
+            for (var _f = true, response_1 = (e_1 = void 0, __asyncValues(response)), response_1_1; response_1_1 = yield __await(response_1.next()), _a3 = response_1_1.done, !_a3; _f = true) {
+              _c2 = response_1_1.value;
+              _f = false;
+              const chunk = _c2;
+              yield yield __await(chunk);
+              if (chunk.candidates && ((_d = chunk.candidates[0]) === null || _d === void 0 ? void 0 : _d.content)) {
+                responseContents.push(chunk.candidates[0].content);
+                for (const part of (_e = chunk.candidates[0].content.parts) !== null && _e !== void 0 ? _e : []) {
+                  if (remoteCallCount < maxRemoteCalls && part.functionCall) {
+                    if (!part.functionCall.name) {
+                      throw new Error("Function call name was not returned by the model.");
+                    }
+                    if (!afcTools.has(part.functionCall.name)) {
+                      throw new Error(`Automatic function calling was requested, but not all the tools the model used implement the CallableTool interface. Available tools: ${afcTools.keys()}, mising tool: ${part.functionCall.name}`);
+                    } else {
+                      const responseParts = yield __await(afcTools.get(part.functionCall.name).callTool([part.functionCall]));
+                      functionResponses.push(...responseParts);
                     }
                   }
                 }
               }
-            } catch (e_1_1) {
-              e_1 = { error: e_1_1 };
-            } finally {
-              try {
-                if (!_f && !_a3 && (_b2 = response_1.return)) yield __await(_b2.call(response_1));
-              } finally {
-                if (e_1) throw e_1.error;
-              }
             }
-            if (functionResponses.length > 0) {
-              wereFunctionsCalled = true;
-              const typedResponseChunk = new GenerateContentResponse();
-              typedResponseChunk.candidates = [
-                {
-                  content: {
-                    role: "user",
-                    parts: functionResponses
-                  }
+          } catch (e_1_1) {
+            e_1 = { error: e_1_1 };
+          } finally {
+            try {
+              if (!_f && !_a3 && (_b2 = response_1.return)) yield __await(_b2.call(response_1));
+            } finally {
+              if (e_1) throw e_1.error;
+            }
+          }
+          if (functionResponses.length > 0) {
+            wereFunctionsCalled = true;
+            const typedResponseChunk = new GenerateContentResponse();
+            typedResponseChunk.candidates = [
+              {
+                content: {
+                  role: "user",
+                  parts: functionResponses
                 }
-              ];
-              yield yield __await(typedResponseChunk);
-              const newContents = [];
-              newContents.push(...responseContents);
-              newContents.push({
-                role: "user",
-                parts: functionResponses
-              });
-              const updatedContents = tContents(params2.contents).concat(newContents);
-              params2.contents = updatedContents;
-            } else {
-              break;
+              }
+            ];
+            yield yield __await(typedResponseChunk);
+            const newContents = [];
+            newContents.push(...responseContents);
+            newContents.push({
+              role: "user",
+              parts: functionResponses
+            });
+            const updatedContents = tContents(params2.contents).concat(newContents);
+            params2.contents = updatedContents;
+          } else {
+            break;
+          }
+        }
+      });
+    })(this, afcToolsMap, params);
+  }
+  async generateContentInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = generateContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:generateContent", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
+        });
+      });
+      return response.then((apiResponse) => {
+        const resp = generateContentResponseFromVertex(apiResponse);
+        const typedResp = new GenerateContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = generateContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:generateContent", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
+        });
+      });
+      return response.then((apiResponse) => {
+        const resp = generateContentResponseFromMldev(apiResponse);
+        const typedResp = new GenerateContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
+  }
+  async generateContentStreamInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = generateContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:streamGenerateContent?alt=sse", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      const apiClient = this.apiClient;
+      response = apiClient.requestStream({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      });
+      return response.then(function(apiResponse) {
+        return __asyncGenerator(this, arguments, function* () {
+          var _a3, e_2, _b2, _c2;
+          try {
+            for (var _d2 = true, apiResponse_1 = __asyncValues(apiResponse), apiResponse_1_1; apiResponse_1_1 = yield __await(apiResponse_1.next()), _a3 = apiResponse_1_1.done, !_a3; _d2 = true) {
+              _c2 = apiResponse_1_1.value;
+              _d2 = false;
+              const chunk = _c2;
+              const resp = generateContentResponseFromVertex(yield __await(chunk.json()));
+              resp["sdkHttpResponse"] = {
+                headers: chunk.headers
+              };
+              const typedResp = new GenerateContentResponse();
+              Object.assign(typedResp, resp);
+              yield yield __await(typedResp);
+            }
+          } catch (e_2_1) {
+            e_2 = { error: e_2_1 };
+          } finally {
+            try {
+              if (!_d2 && !_a3 && (_b2 = apiResponse_1.return)) yield __await(_b2.call(apiResponse_1));
+            } finally {
+              if (e_2) throw e_2.error;
             }
           }
         });
-      })(this, afcToolsMap, params);
-    });
-  }
-  generateContentInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = generateContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:generateContent", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = generateContentResponseFromVertex(apiResponse);
-          const typedResp = new GenerateContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        const body = generateContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:generateContent", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = generateContentResponseFromMldev(apiResponse);
-          const typedResp = new GenerateContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
-  }
-  generateContentStreamInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = generateContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:streamGenerateContent?alt=sse", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        const apiClient = this.apiClient;
-        response = apiClient.requestStream({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        });
-        return response.then(function(apiResponse) {
-          return __asyncGenerator(this, arguments, function* () {
-            var _a3, e_2, _b2, _c2;
-            try {
-              for (var _d2 = true, apiResponse_1 = __asyncValues(apiResponse), apiResponse_1_1; apiResponse_1_1 = yield __await(apiResponse_1.next()), _a3 = apiResponse_1_1.done, !_a3; _d2 = true) {
-                _c2 = apiResponse_1_1.value;
-                _d2 = false;
-                const chunk = _c2;
-                const resp = generateContentResponseFromVertex(yield __await(chunk.json()));
-                resp["sdkHttpResponse"] = {
-                  headers: chunk.headers
-                };
-                const typedResp = new GenerateContentResponse();
-                Object.assign(typedResp, resp);
-                yield yield __await(typedResp);
-              }
-            } catch (e_2_1) {
-              e_2 = { error: e_2_1 };
-            } finally {
-              try {
-                if (!_d2 && !_a3 && (_b2 = apiResponse_1.return)) yield __await(_b2.call(apiResponse_1));
-              } finally {
-                if (e_2) throw e_2.error;
-              }
+      });
+    } else {
+      const body = generateContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:streamGenerateContent?alt=sse", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      const apiClient = this.apiClient;
+      response = apiClient.requestStream({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      });
+      return response.then(function(apiResponse) {
+        return __asyncGenerator(this, arguments, function* () {
+          var _a3, e_3, _b2, _c2;
+          try {
+            for (var _d2 = true, apiResponse_2 = __asyncValues(apiResponse), apiResponse_2_1; apiResponse_2_1 = yield __await(apiResponse_2.next()), _a3 = apiResponse_2_1.done, !_a3; _d2 = true) {
+              _c2 = apiResponse_2_1.value;
+              _d2 = false;
+              const chunk = _c2;
+              const resp = generateContentResponseFromMldev(yield __await(chunk.json()));
+              resp["sdkHttpResponse"] = {
+                headers: chunk.headers
+              };
+              const typedResp = new GenerateContentResponse();
+              Object.assign(typedResp, resp);
+              yield yield __await(typedResp);
             }
-          });
-        });
-      } else {
-        const body = generateContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:streamGenerateContent?alt=sse", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        const apiClient = this.apiClient;
-        response = apiClient.requestStream({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        });
-        return response.then(function(apiResponse) {
-          return __asyncGenerator(this, arguments, function* () {
-            var _a3, e_3, _b2, _c2;
+          } catch (e_3_1) {
+            e_3 = { error: e_3_1 };
+          } finally {
             try {
-              for (var _d2 = true, apiResponse_2 = __asyncValues(apiResponse), apiResponse_2_1; apiResponse_2_1 = yield __await(apiResponse_2.next()), _a3 = apiResponse_2_1.done, !_a3; _d2 = true) {
-                _c2 = apiResponse_2_1.value;
-                _d2 = false;
-                const chunk = _c2;
-                const resp = generateContentResponseFromMldev(yield __await(chunk.json()));
-                resp["sdkHttpResponse"] = {
-                  headers: chunk.headers
-                };
-                const typedResp = new GenerateContentResponse();
-                Object.assign(typedResp, resp);
-                yield yield __await(typedResp);
-              }
-            } catch (e_3_1) {
-              e_3 = { error: e_3_1 };
+              if (!_d2 && !_a3 && (_b2 = apiResponse_2.return)) yield __await(_b2.call(apiResponse_2));
             } finally {
-              try {
-                if (!_d2 && !_a3 && (_b2 = apiResponse_2.return)) yield __await(_b2.call(apiResponse_2));
-              } finally {
-                if (e_3) throw e_3.error;
-              }
+              if (e_3) throw e_3.error;
             }
-          });
+          }
         });
-      }
-    });
+      });
+    }
   }
   /**
    * Calculates embeddings for the given contents. Only text is supported.
@@ -11834,222 +11737,214 @@ var Models = class extends BaseModule {
    * console.log(response);
    * ```
    */
-  embedContent(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = embedContentParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async embedContent(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = embedContentParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = embedContentResponseFromVertex(apiResponse);
-          const typedResp = new EmbedContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = embedContentResponseFromVertex(apiResponse);
+        const typedResp = new EmbedContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = embedContentParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:batchEmbedContents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = embedContentParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:batchEmbedContents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = embedContentResponseFromMldev(apiResponse);
-          const typedResp = new EmbedContentResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = embedContentResponseFromMldev(apiResponse);
+        const typedResp = new EmbedContentResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Private method for generating images.
    */
-  generateImagesInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = generateImagesParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async generateImagesInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = generateImagesParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = generateImagesResponseFromVertex(apiResponse);
-          const typedResp = new GenerateImagesResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = generateImagesResponseFromVertex(apiResponse);
+        const typedResp = new GenerateImagesResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = generateImagesParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = generateImagesParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = generateImagesResponseFromMldev(apiResponse);
-          const typedResp = new GenerateImagesResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = generateImagesResponseFromMldev(apiResponse);
+        const typedResp = new GenerateImagesResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Private method for editing an image.
    */
-  editImageInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = editImageParametersInternalToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async editImageInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = editImageParametersInternalToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = editImageResponseFromVertex(apiResponse);
-          const typedResp = new EditImageResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = editImageResponseFromVertex(apiResponse);
+        const typedResp = new EditImageResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
   /**
    * Private method for upscaling an image.
    */
-  upscaleImageInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = upscaleImageAPIParametersInternalToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async upscaleImageInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = upscaleImageAPIParametersInternalToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = upscaleImageResponseFromVertex(apiResponse);
-          const typedResp = new UpscaleImageResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = upscaleImageResponseFromVertex(apiResponse);
+        const typedResp = new UpscaleImageResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
   /**
    * Recontextualizes an image.
@@ -12089,38 +11984,36 @@ var Models = class extends BaseModule {
    * console.log(response2?.generatedImages?.[0]?.image?.imageBytes);
    * ```
    */
-  recontextImage(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = recontextImageParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = recontextImageResponseFromVertex(apiResponse);
-          const typedResp = new RecontextImageResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+  async recontextImage(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = recontextImageParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = recontextImageResponseFromVertex(apiResponse);
+        const typedResp = new RecontextImageResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
   /**
    * Segments an image, creating a mask of a specified area.
@@ -12142,38 +12035,36 @@ var Models = class extends BaseModule {
    * console.log(response?.generatedMasks?.[0]?.mask?.imageBytes);
    * ```
    */
-  segmentImage(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = segmentImageParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predict", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = segmentImageResponseFromVertex(apiResponse);
-          const typedResp = new SegmentImageResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+  async segmentImage(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = segmentImageParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predict", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = segmentImageResponseFromVertex(apiResponse);
+        const typedResp = new SegmentImageResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
   /**
    * Fetches information about a model by name.
@@ -12183,119 +12074,115 @@ var Models = class extends BaseModule {
    * const modelInfo = await ai.models.get({model: 'gemini-2.0-flash'});
    * ```
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = getModelParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = modelFromVertex(apiResponse);
-          return resp;
-        });
-      } else {
-        const body = getModelParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = modelFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = getModelParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = modelFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = getModelParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = modelFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = listModelsParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{models_url}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async listInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = listModelsParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{models_url}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = listModelsResponseFromVertex(apiResponse);
-          const typedResp = new ListModelsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = listModelsResponseFromVertex(apiResponse);
+        const typedResp = new ListModelsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = listModelsParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{models_url}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = listModelsParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{models_url}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = listModelsResponseFromMldev(apiResponse);
-          const typedResp = new ListModelsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = listModelsResponseFromMldev(apiResponse);
+        const typedResp = new ListModelsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Updates a tuned model by its name.
@@ -12314,54 +12201,52 @@ var Models = class extends BaseModule {
    * });
    * ```
    */
-  update(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = updateModelParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "PATCH",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = modelFromVertex(apiResponse);
-          return resp;
-        });
-      } else {
-        const body = updateModelParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "PATCH",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = modelFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+  async update(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = updateModelParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "PATCH",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = modelFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = updateModelParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "PATCH",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = modelFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
   /**
    * Deletes a tuned model by its name.
@@ -12374,70 +12259,68 @@ var Models = class extends BaseModule {
    * const response = await ai.models.delete({model: 'tuned-model-name'});
    * ```
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = deleteModelParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async delete(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = deleteModelParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = deleteModelResponseFromVertex(apiResponse);
-          const typedResp = new DeleteModelResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteModelResponseFromVertex(apiResponse);
+        const typedResp = new DeleteModelResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = deleteModelParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = deleteModelParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = deleteModelResponseFromMldev(apiResponse);
-          const typedResp = new DeleteModelResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = deleteModelResponseFromMldev(apiResponse);
+        const typedResp = new DeleteModelResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Counts the number of tokens in the given contents. Multimodal input is
@@ -12455,70 +12338,68 @@ var Models = class extends BaseModule {
    * console.log(response);
    * ```
    */
-  countTokens(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = countTokensParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:countTokens", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async countTokens(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = countTokensParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:countTokens", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = countTokensResponseFromVertex(apiResponse);
-          const typedResp = new CountTokensResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = countTokensResponseFromVertex(apiResponse);
+        const typedResp = new CountTokensResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = countTokensParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:countTokens", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = countTokensParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:countTokens", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = countTokensResponseFromMldev(apiResponse);
-          const typedResp = new CountTokensResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = countTokensResponseFromMldev(apiResponse);
+        const typedResp = new CountTokensResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Given a list of contents, returns a corresponding TokensInfo containing
@@ -12538,100 +12419,96 @@ var Models = class extends BaseModule {
    * console.log(response);
    * ```
    */
-  computeTokens(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = computeTokensParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:computeTokens", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async computeTokens(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = computeTokensParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:computeTokens", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = computeTokensResponseFromVertex(apiResponse);
-          const typedResp = new ComputeTokensResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = computeTokensResponseFromVertex(apiResponse);
+        const typedResp = new ComputeTokensResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
   /**
    * Private method for generating videos.
    */
-  generateVideosInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = generateVideosParametersToVertex(this.apiClient, params);
-        path2 = formatMap("{model}:predictLongRunning", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = generateVideosOperationFromVertex(apiResponse);
-          const typedResp = new GenerateVideosOperation();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      } else {
-        const body = generateVideosParametersToMldev(this.apiClient, params);
-        path2 = formatMap("{model}:predictLongRunning", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = generateVideosOperationFromMldev(apiResponse);
-          const typedResp = new GenerateVideosOperation();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async generateVideosInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = generateVideosParametersToVertex(this.apiClient, params);
+      path2 = formatMap("{model}:predictLongRunning", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = generateVideosOperationFromVertex(apiResponse);
+        const typedResp = new GenerateVideosOperation();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = generateVideosParametersToMldev(this.apiClient, params);
+      path2 = formatMap("{model}:predictLongRunning", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = generateVideosOperationFromMldev(apiResponse);
+        const typedResp = new GenerateVideosOperation();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
 };
 var Operations = class extends BaseModule {
@@ -12645,39 +12522,37 @@ var Operations = class extends BaseModule {
    * @param parameters The parameters for the get operation request.
    * @return The updated Operation object, with the latest status or result.
    */
-  getVideosOperation(parameters) {
-    return __async(this, null, function* () {
-      const operation = parameters.operation;
-      const config = parameters.config;
-      if (operation.name === void 0 || operation.name === "") {
-        throw new Error("Operation name is required.");
+  async getVideosOperation(parameters) {
+    const operation = parameters.operation;
+    const config = parameters.config;
+    if (operation.name === void 0 || operation.name === "") {
+      throw new Error("Operation name is required.");
+    }
+    if (this.apiClient.isVertexAI()) {
+      const resourceName2 = operation.name.split("/operations/")[0];
+      let httpOptions = void 0;
+      if (config && "httpOptions" in config) {
+        httpOptions = config.httpOptions;
       }
-      if (this.apiClient.isVertexAI()) {
-        const resourceName2 = operation.name.split("/operations/")[0];
-        let httpOptions = void 0;
-        if (config && "httpOptions" in config) {
-          httpOptions = config.httpOptions;
-        }
-        const rawOperation = yield this.fetchPredictVideosOperationInternal({
-          operationName: operation.name,
-          resourceName: resourceName2,
-          config: { httpOptions }
-        });
-        return operation._fromAPIResponse({
-          apiResponse: rawOperation,
-          _isVertexAI: true
-        });
-      } else {
-        const rawOperation = yield this.getVideosOperationInternal({
-          operationName: operation.name,
-          config
-        });
-        return operation._fromAPIResponse({
-          apiResponse: rawOperation,
-          _isVertexAI: false
-        });
-      }
-    });
+      const rawOperation = await this.fetchPredictVideosOperationInternal({
+        operationName: operation.name,
+        resourceName: resourceName2,
+        config: { httpOptions }
+      });
+      return operation._fromAPIResponse({
+        apiResponse: rawOperation,
+        _isVertexAI: true
+      });
+    } else {
+      const rawOperation = await this.getVideosOperationInternal({
+        operationName: operation.name,
+        config
+      });
+      return operation._fromAPIResponse({
+        apiResponse: rawOperation,
+        _isVertexAI: false
+      });
+    }
   }
   /**
    * Gets the status of a long-running operation.
@@ -12685,110 +12560,104 @@ var Operations = class extends BaseModule {
    * @param parameters The parameters for the get operation request.
    * @return The updated Operation object, with the latest status or result.
    */
-  get(parameters) {
-    return __async(this, null, function* () {
-      const operation = parameters.operation;
-      const config = parameters.config;
-      if (operation.name === void 0 || operation.name === "") {
-        throw new Error("Operation name is required.");
+  async get(parameters) {
+    const operation = parameters.operation;
+    const config = parameters.config;
+    if (operation.name === void 0 || operation.name === "") {
+      throw new Error("Operation name is required.");
+    }
+    if (this.apiClient.isVertexAI()) {
+      const resourceName2 = operation.name.split("/operations/")[0];
+      let httpOptions = void 0;
+      if (config && "httpOptions" in config) {
+        httpOptions = config.httpOptions;
       }
-      if (this.apiClient.isVertexAI()) {
-        const resourceName2 = operation.name.split("/operations/")[0];
-        let httpOptions = void 0;
-        if (config && "httpOptions" in config) {
-          httpOptions = config.httpOptions;
-        }
-        const rawOperation = yield this.fetchPredictVideosOperationInternal({
-          operationName: operation.name,
-          resourceName: resourceName2,
-          config: { httpOptions }
-        });
-        return operation._fromAPIResponse({
-          apiResponse: rawOperation,
-          _isVertexAI: true
-        });
-      } else {
-        const rawOperation = yield this.getVideosOperationInternal({
-          operationName: operation.name,
-          config
-        });
-        return operation._fromAPIResponse({
-          apiResponse: rawOperation,
-          _isVertexAI: false
-        });
-      }
-    });
+      const rawOperation = await this.fetchPredictVideosOperationInternal({
+        operationName: operation.name,
+        resourceName: resourceName2,
+        config: { httpOptions }
+      });
+      return operation._fromAPIResponse({
+        apiResponse: rawOperation,
+        _isVertexAI: true
+      });
+    } else {
+      const rawOperation = await this.getVideosOperationInternal({
+        operationName: operation.name,
+        config
+      });
+      return operation._fromAPIResponse({
+        apiResponse: rawOperation,
+        _isVertexAI: false
+      });
+    }
   }
-  getVideosOperationInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = getOperationParametersToVertex(params);
-        path2 = formatMap("{operationName}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response;
-      } else {
-        const body = getOperationParametersToMldev(params);
-        path2 = formatMap("{operationName}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response;
-      }
-    });
+  async getVideosOperationInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = getOperationParametersToVertex(params);
+      path2 = formatMap("{operationName}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response;
+    } else {
+      const body = getOperationParametersToMldev(params);
+      path2 = formatMap("{operationName}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response;
+    }
   }
-  fetchPredictVideosOperationInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = fetchPredictOperationParametersToVertex(params);
-        path2 = formatMap("{resourceName}:fetchPredictOperation", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response;
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+  async fetchPredictVideosOperationInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = fetchPredictOperationParametersToVertex(params);
+      path2 = formatMap("{resourceName}:fetchPredictOperation", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response;
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
 };
 function blobToMldev(fromObject) {
@@ -13345,37 +13214,35 @@ var Tokens = class extends BaseModule {
    * const token = await ai.tokens.create(config);
    * ```
    */
-  create(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("The client.tokens.create method is only supported by the Gemini Developer API.");
-      } else {
-        const body = createAuthTokenParametersToMldev(this.apiClient, params);
-        path2 = formatMap("auth_tokens", body["_url"]);
-        queryParams = body["_query"];
-        delete body["config"];
-        delete body["_url"];
-        delete body["_query"];
-        const transformedBody = convertBidiSetupToTokenSetup(body, params.config);
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(transformedBody),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async create(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("The client.tokens.create method is only supported by the Gemini Developer API.");
+    } else {
+      const body = createAuthTokenParametersToMldev(this.apiClient, params);
+      path2 = formatMap("auth_tokens", body["_url"]);
+      queryParams = body["_query"];
+      delete body["config"];
+      delete body["_url"];
+      delete body["_query"];
+      const transformedBody = convertBidiSetupToTokenSetup(body, params.config);
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(transformedBody),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
 };
 function deleteDocumentConfigToMldev(fromObject, parentObject) {
@@ -13460,9 +13327,9 @@ var Documents = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.list = (params) => __async(this, null, function* () {
-      return new Pager(PagedItem.PAGED_ITEM_DOCUMENTS, (x) => this.listInternal({ parent: params.parent, config: x.config }), yield this.listInternal(params), params);
-    });
+    this.list = async (params) => {
+      return new Pager(PagedItem.PAGED_ITEM_DOCUMENTS, (x) => this.listInternal({ parent: params.parent, config: x.config }), await this.listInternal(params), params);
+    };
   }
   /**
    * Gets a Document.
@@ -13470,97 +13337,91 @@ var Documents = class extends BaseModule {
    * @param params - The parameters for getting a document.
    * @return Document.
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = getDocumentParametersToMldev(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = getDocumentParametersToMldev(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Deletes a Document.
    *
    * @param params - The parameters for deleting a document.
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = deleteDocumentParametersToMldev(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        yield this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        });
-      }
-    });
+  async delete(params) {
+    var _a2, _b;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = deleteDocumentParametersToMldev(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      await this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = listDocumentsParametersToMldev(params);
-        path2 = formatMap("{parent}/documents", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = listDocumentsResponseFromMldev(apiResponse);
-          const typedResp = new ListDocumentsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async listInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = listDocumentsParametersToMldev(params);
+      path2 = formatMap("{parent}/documents", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = listDocumentsResponseFromMldev(apiResponse);
+        const typedResp = new ListDocumentsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
 };
 var FileSearchStores = class extends BaseModule {
@@ -13568,9 +13429,9 @@ var FileSearchStores = class extends BaseModule {
     super();
     this.apiClient = apiClient;
     this.documents = documents;
-    this.list = (..._0) => __async(this, [..._0], function* (params = {}) {
-      return new Pager(PagedItem.PAGED_ITEM_FILE_SEARCH_STORES, (x) => this.listInternal(x), yield this.listInternal(params), params);
-    });
+    this.list = async (params = {}) => {
+      return new Pager(PagedItem.PAGED_ITEM_FILE_SEARCH_STORES, (x) => this.listInternal(x), await this.listInternal(params), params);
+    };
   }
   /**
    * Uploads a file asynchronously to a given File Search Store.
@@ -13608,13 +13469,11 @@ var FileSearchStores = class extends BaseModule {
    * console.log(operation.name);
    * ```
    */
-  uploadToFileSearchStore(params) {
-    return __async(this, null, function* () {
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("Vertex AI does not support uploading files to a file search store.");
-      }
-      return this.apiClient.uploadFileToFileSearchStore(params.fileSearchStoreName, params.file, params.config);
-    });
+  async uploadToFileSearchStore(params) {
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("Vertex AI does not support uploading files to a file search store.");
+    }
+    return this.apiClient.uploadFileToFileSearchStore(params.fileSearchStoreName, params.file, params.config);
   }
   /**
    * Creates a File Search Store.
@@ -13622,35 +13481,33 @@ var FileSearchStores = class extends BaseModule {
    * @param params - The parameters for creating a File Search Store.
    * @return FileSearchStore.
    */
-  create(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = createFileSearchStoreParametersToMldev(params);
-        path2 = formatMap("fileSearchStores", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async create(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = createFileSearchStoreParametersToMldev(params);
+      path2 = formatMap("fileSearchStores", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Gets a File Search Store.
@@ -13658,130 +13515,122 @@ var FileSearchStores = class extends BaseModule {
    * @param params - The parameters for getting a File Search Store.
    * @return FileSearchStore.
    */
-  get(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = getFileSearchStoreParametersToMldev(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((resp) => {
-          return resp;
-        });
-      }
-    });
+  async get(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = getFileSearchStoreParametersToMldev(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((resp) => {
+        return resp;
+      });
+    }
   }
   /**
    * Deletes a File Search Store.
    *
    * @param params - The parameters for deleting a File Search Store.
    */
-  delete(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = deleteFileSearchStoreParametersToMldev(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        yield this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "DELETE",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        });
-      }
-    });
+  async delete(params) {
+    var _a2, _b;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = deleteFileSearchStoreParametersToMldev(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      await this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "DELETE",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = listFileSearchStoresParametersToMldev(params);
-        path2 = formatMap("fileSearchStores", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = listFileSearchStoresResponseFromMldev(apiResponse);
-          const typedResp = new ListFileSearchStoresResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async listInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = listFileSearchStoresParametersToMldev(params);
+      path2 = formatMap("fileSearchStores", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = listFileSearchStoresResponseFromMldev(apiResponse);
+        const typedResp = new ListFileSearchStoresResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
-  uploadToFileSearchStoreInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = uploadToFileSearchStoreParametersToMldev(params);
-        path2 = formatMap("upload/v1beta/{file_search_store_name}:uploadToFileSearchStore", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = uploadToFileSearchStoreResumableResponseFromMldev(apiResponse);
-          const typedResp = new UploadToFileSearchStoreResumableResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async uploadToFileSearchStoreInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = uploadToFileSearchStoreParametersToMldev(params);
+      path2 = formatMap("upload/v1beta/{file_search_store_name}:uploadToFileSearchStore", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = uploadToFileSearchStoreResumableResponseFromMldev(apiResponse);
+        const typedResp = new UploadToFileSearchStoreResumableResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Imports a File from File Service to a FileSearchStore.
@@ -13791,38 +13640,36 @@ var FileSearchStores = class extends BaseModule {
    * @param params - The parameters for importing a file to a file search store.
    * @return ImportFileOperation.
    */
-  importFile(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = importFileParametersToMldev(params);
-        path2 = formatMap("{file_search_store_name}:importFile", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json();
-        });
-        return response.then((apiResponse) => {
-          const resp = importFileOperationFromMldev(apiResponse);
-          const typedResp = new ImportFileOperation();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+  async importFile(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = importFileParametersToMldev(params);
+      path2 = formatMap("{file_search_store_name}:importFile", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json();
+      });
+      return response.then((apiResponse) => {
+        const resp = importFileOperationFromMldev(apiResponse);
+        const typedResp = new ImportFileOperation();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
 };
 var uuid4Internal = function() {
@@ -14131,21 +13978,17 @@ function ReadableStreamFrom(iterable) {
   return makeReadableStream({
     start() {
     },
-    pull(controller) {
-      return __async(this, null, function* () {
-        const { done, value } = yield iter.next();
-        if (done) {
-          controller.close();
-        } else {
-          controller.enqueue(value);
-        }
-      });
+    async pull(controller) {
+      const { done, value } = await iter.next();
+      if (done) {
+        controller.close();
+      } else {
+        controller.enqueue(value);
+      }
     },
-    cancel() {
-      return __async(this, null, function* () {
-        var _a3;
-        yield (_a3 = iter.return) === null || _a3 === void 0 ? void 0 : _a3.call(iter);
-      });
+    async cancel() {
+      var _a2;
+      await ((_a2 = iter.return) === null || _a2 === void 0 ? void 0 : _a2.call(iter));
     }
   });
 }
@@ -14154,46 +13997,40 @@ function ReadableStreamToAsyncIterable(stream) {
     return stream;
   const reader = stream.getReader();
   return {
-    next() {
-      return __async(this, null, function* () {
-        try {
-          const result = yield reader.read();
-          if (result === null || result === void 0 ? void 0 : result.done)
-            reader.releaseLock();
-          return result;
-        } catch (e) {
+    async next() {
+      try {
+        const result = await reader.read();
+        if (result === null || result === void 0 ? void 0 : result.done)
           reader.releaseLock();
-          throw e;
-        }
-      });
-    },
-    return() {
-      return __async(this, null, function* () {
-        const cancelPromise = reader.cancel();
+        return result;
+      } catch (e) {
         reader.releaseLock();
-        yield cancelPromise;
-        return { done: true, value: void 0 };
-      });
+        throw e;
+      }
+    },
+    async return() {
+      const cancelPromise = reader.cancel();
+      reader.releaseLock();
+      await cancelPromise;
+      return { done: true, value: void 0 };
     },
     [Symbol.asyncIterator]() {
       return this;
     }
   };
 }
-function CancelReadableStream(stream) {
-  return __async(this, null, function* () {
-    var _a2, _b;
-    if (stream === null || typeof stream !== "object")
-      return;
-    if (stream[Symbol.asyncIterator]) {
-      yield (_b = (_a2 = stream[Symbol.asyncIterator]()).return) === null || _b === void 0 ? void 0 : _b.call(_a2);
-      return;
-    }
-    const reader = stream.getReader();
-    const cancelPromise = reader.cancel();
-    reader.releaseLock();
-    yield cancelPromise;
-  });
+async function CancelReadableStream(stream) {
+  var _a2, _b;
+  if (stream === null || typeof stream !== "object")
+    return;
+  if (stream[Symbol.asyncIterator]) {
+    await ((_b = (_a2 = stream[Symbol.asyncIterator]()).return) === null || _b === void 0 ? void 0 : _b.call(_a2));
+    return;
+  }
+  const reader = stream.getReader();
+  const cancelPromise = reader.cancel();
+  reader.releaseLock();
+  await cancelPromise;
 }
 var FallbackEncoder = ({ headers, body }) => {
   return {
@@ -14222,65 +14059,61 @@ var isAsyncIterable = (value) => value != null && typeof value === "object" && t
 var isBlobLike = (value) => value != null && typeof value === "object" && typeof value.size === "number" && typeof value.type === "string" && typeof value.text === "function" && typeof value.slice === "function" && typeof value.arrayBuffer === "function";
 var isFileLike = (value) => value != null && typeof value === "object" && typeof value.name === "string" && typeof value.lastModified === "number" && isBlobLike(value);
 var isResponseLike = (value) => value != null && typeof value === "object" && typeof value.url === "string" && typeof value.blob === "function";
-function toFile(value, name, options) {
-  return __async(this, null, function* () {
-    checkFileSupport();
-    value = yield value;
-    if (isFileLike(value)) {
-      if (value instanceof File) {
-        return value;
-      }
-      return makeFile([yield value.arrayBuffer()], value.name);
+async function toFile(value, name, options) {
+  checkFileSupport();
+  value = await value;
+  if (isFileLike(value)) {
+    if (value instanceof File) {
+      return value;
     }
-    if (isResponseLike(value)) {
-      const blob = yield value.blob();
-      name || (name = new URL(value.url).pathname.split(/[\\/]/).pop());
-      return makeFile(yield getBytes(blob), name, options);
+    return makeFile([await value.arrayBuffer()], value.name);
+  }
+  if (isResponseLike(value)) {
+    const blob = await value.blob();
+    name || (name = new URL(value.url).pathname.split(/[\\/]/).pop());
+    return makeFile(await getBytes(blob), name, options);
+  }
+  const parts = await getBytes(value);
+  name || (name = getName(value));
+  if (!(options === null || options === void 0 ? void 0 : options.type)) {
+    const type = parts.find((part) => typeof part === "object" && "type" in part && part.type);
+    if (typeof type === "string") {
+      options = Object.assign(Object.assign({}, options), { type });
     }
-    const parts = yield getBytes(value);
-    name || (name = getName(value));
-    if (!(options === null || options === void 0 ? void 0 : options.type)) {
-      const type = parts.find((part) => typeof part === "object" && "type" in part && part.type);
-      if (typeof type === "string") {
-        options = Object.assign(Object.assign({}, options), { type });
-      }
-    }
-    return makeFile(parts, name, options);
-  });
+  }
+  return makeFile(parts, name, options);
 }
-function getBytes(value) {
-  return __async(this, null, function* () {
-    var _a2, e_1, _b, _c;
-    var _d;
-    let parts = [];
-    if (typeof value === "string" || ArrayBuffer.isView(value) || // includes Uint8Array, Buffer, etc.
-    value instanceof ArrayBuffer) {
-      parts.push(value);
-    } else if (isBlobLike(value)) {
-      parts.push(value instanceof Blob ? value : yield value.arrayBuffer());
-    } else if (isAsyncIterable(value)) {
-      try {
-        for (var _e = true, value_1 = __asyncValues(value), value_1_1; value_1_1 = yield value_1.next(), _a2 = value_1_1.done, !_a2; _e = true) {
-          _c = value_1_1.value;
-          _e = false;
-          const chunk = _c;
-          parts.push(...yield getBytes(chunk));
-        }
-      } catch (e_1_1) {
-        e_1 = { error: e_1_1 };
-      } finally {
-        try {
-          if (!_e && !_a2 && (_b = value_1.return)) yield _b.call(value_1);
-        } finally {
-          if (e_1) throw e_1.error;
-        }
+async function getBytes(value) {
+  var _a2, e_1, _b, _c;
+  var _d;
+  let parts = [];
+  if (typeof value === "string" || ArrayBuffer.isView(value) || // includes Uint8Array, Buffer, etc.
+  value instanceof ArrayBuffer) {
+    parts.push(value);
+  } else if (isBlobLike(value)) {
+    parts.push(value instanceof Blob ? value : await value.arrayBuffer());
+  } else if (isAsyncIterable(value)) {
+    try {
+      for (var _e = true, value_1 = __asyncValues(value), value_1_1; value_1_1 = await value_1.next(), _a2 = value_1_1.done, !_a2; _e = true) {
+        _c = value_1_1.value;
+        _e = false;
+        const chunk = _c;
+        parts.push(...await getBytes(chunk));
       }
-    } else {
-      const constructor = (_d = value === null || value === void 0 ? void 0 : value.constructor) === null || _d === void 0 ? void 0 : _d.name;
-      throw new Error(`Unexpected data type: ${typeof value}${constructor ? `; constructor: ${constructor}` : ""}${propsForError(value)}`);
+    } catch (e_1_1) {
+      e_1 = { error: e_1_1 };
+    } finally {
+      try {
+        if (!_e && !_a2 && (_b = value_1.return)) await _b.call(value_1);
+      } finally {
+        if (e_1) throw e_1.error;
+      }
     }
-    return parts;
-  });
+  } else {
+    const constructor = (_d = value === null || value === void 0 ? void 0 : value.constructor) === null || _d === void 0 ? void 0 : _d.name;
+    throw new Error(`Unexpected data type: ${typeof value}${constructor ? `; constructor: ${constructor}` : ""}${propsForError(value)}`);
+  }
+  return parts;
 }
 function propsForError(value) {
   if (typeof value !== "object" || value === null)
@@ -14730,29 +14563,23 @@ var Stream = class _Stream {
     const self = this;
     let iter;
     return makeReadableStream({
-      start() {
-        return __async(this, null, function* () {
-          iter = self[Symbol.asyncIterator]();
-        });
+      async start() {
+        iter = self[Symbol.asyncIterator]();
       },
-      pull(ctrl) {
-        return __async(this, null, function* () {
-          try {
-            const { value, done } = yield iter.next();
-            if (done)
-              return ctrl.close();
-            const bytes = encodeUTF8(JSON.stringify(value) + "\n");
-            ctrl.enqueue(bytes);
-          } catch (err) {
-            ctrl.error(err);
-          }
-        });
+      async pull(ctrl) {
+        try {
+          const { value, done } = await iter.next();
+          if (done)
+            return ctrl.close();
+          const bytes = encodeUTF8(JSON.stringify(value) + "\n");
+          ctrl.enqueue(bytes);
+        } catch (err) {
+          ctrl.error(err);
+        }
       },
-      cancel() {
-        return __async(this, null, function* () {
-          var _a3;
-          yield (_a3 = iter.return) === null || _a3 === void 0 ? void 0 : _a3.call(iter);
-        });
+      async cancel() {
+        var _a2;
+        await ((_a2 = iter.return) === null || _a2 === void 0 ? void 0 : _a2.call(iter));
       }
     });
   }
@@ -14880,43 +14707,41 @@ function partition(str, delimiter) {
   }
   return [str, "", ""];
 }
-function defaultParseResponse(client, props) {
-  return __async(this, null, function* () {
-    const { response, requestLogID, retryOfRequestLogID, startTime } = props;
-    const body = yield (() => __async(null, null, function* () {
-      var _a2;
-      if (props.options.stream) {
-        loggerFor(client).debug("response", response.status, response.url, response.headers, response.body);
-        if (props.options.__streamClass) {
-          return props.options.__streamClass.fromSSEResponse(response, props.controller, client);
-        }
-        return Stream.fromSSEResponse(response, props.controller, client);
+async function defaultParseResponse(client, props) {
+  const { response, requestLogID, retryOfRequestLogID, startTime } = props;
+  const body = await (async () => {
+    var _a2;
+    if (props.options.stream) {
+      loggerFor(client).debug("response", response.status, response.url, response.headers, response.body);
+      if (props.options.__streamClass) {
+        return props.options.__streamClass.fromSSEResponse(response, props.controller, client);
       }
-      if (response.status === 204) {
-        return null;
-      }
-      if (props.options.__binaryResponse) {
-        return response;
-      }
-      const contentType = response.headers.get("content-type");
-      const mediaType = (_a2 = contentType === null || contentType === void 0 ? void 0 : contentType.split(";")[0]) === null || _a2 === void 0 ? void 0 : _a2.trim();
-      const isJSON = (mediaType === null || mediaType === void 0 ? void 0 : mediaType.includes("application/json")) || (mediaType === null || mediaType === void 0 ? void 0 : mediaType.endsWith("+json"));
-      if (isJSON) {
-        const json = yield response.json();
-        return json;
-      }
-      const text = yield response.text();
-      return text;
-    }))();
-    loggerFor(client).debug(`[${requestLogID}] response parsed`, formatRequestDetails({
-      retryOfRequestLogID,
-      url: response.url,
-      status: response.status,
-      body,
-      durationMs: Date.now() - startTime
-    }));
-    return body;
-  });
+      return Stream.fromSSEResponse(response, props.controller, client);
+    }
+    if (response.status === 204) {
+      return null;
+    }
+    if (props.options.__binaryResponse) {
+      return response;
+    }
+    const contentType = response.headers.get("content-type");
+    const mediaType = (_a2 = contentType === null || contentType === void 0 ? void 0 : contentType.split(";")[0]) === null || _a2 === void 0 ? void 0 : _a2.trim();
+    const isJSON = (mediaType === null || mediaType === void 0 ? void 0 : mediaType.includes("application/json")) || (mediaType === null || mediaType === void 0 ? void 0 : mediaType.endsWith("+json"));
+    if (isJSON) {
+      const json = await response.json();
+      return json;
+    }
+    const text = await response.text();
+    return text;
+  })();
+  loggerFor(client).debug(`[${requestLogID}] response parsed`, formatRequestDetails({
+    retryOfRequestLogID,
+    url: response.url,
+    status: response.status,
+    body,
+    durationMs: Date.now() - startTime
+  }));
+  return body;
 }
 var APIPromise = class _APIPromise extends Promise {
   constructor(client, responsePromise, parseResponse = defaultParseResponse) {
@@ -14928,9 +14753,7 @@ var APIPromise = class _APIPromise extends Promise {
     this.client = client;
   }
   _thenUnwrap(transform) {
-    return new _APIPromise(this.client, this.responsePromise, (client, props) => __async(this, null, function* () {
-      return transform(yield this.parseResponse(client, props), props);
-    }));
+    return new _APIPromise(this.client, this.responsePromise, async (client, props) => transform(await this.parseResponse(client, props), props));
   }
   /**
    * Gets the raw `Response` instance instead of parsing the response
@@ -14956,11 +14779,9 @@ var APIPromise = class _APIPromise extends Promise {
    * Try setting `"moduleResolution": "NodeNext"` or add `"lib": ["DOM"]`
    * to your `tsconfig.json`.
    */
-  withResponse() {
-    return __async(this, null, function* () {
-      const [data, response] = yield Promise.all([this.parse(), this.asResponse()]);
-      return { data, response };
-    });
+  async withResponse() {
+    const [data, response] = await Promise.all([this.parse(), this.asResponse()]);
+    return { data, response };
   }
   parse() {
     if (!this.parsedPromise) {
@@ -14984,7 +14805,7 @@ function* iterateHeaders(headers) {
     return;
   if (brand_privateNullableHeaders in headers) {
     const { values, nulls } = headers;
-    yield* __yieldStar(values.entries());
+    yield* values.entries();
     for (const name of nulls) {
       yield [name, null];
     }
@@ -15114,20 +14935,18 @@ var BaseGeminiNextGenAPIClient = class _BaseGeminiNextGenAPIClient {
     }
     throw new Error('Could not resolve authentication method. Expected the apiKey to be set. Or for the "x-goog-api-key" headers to be explicitly omitted');
   }
-  authHeaders(opts) {
-    return __async(this, null, function* () {
-      const existingHeaders = buildHeaders([opts.headers]);
-      if (existingHeaders.values.has("authorization") || existingHeaders.values.has("x-goog-api-key")) {
-        return void 0;
-      }
-      if (this.apiKey) {
-        return buildHeaders([{ "x-goog-api-key": this.apiKey }]);
-      }
-      if (this.clientAdapter.isVertexAI()) {
-        return buildHeaders([yield this.clientAdapter.getAuthHeaders()]);
-      }
+  async authHeaders(opts) {
+    const existingHeaders = buildHeaders([opts.headers]);
+    if (existingHeaders.values.has("authorization") || existingHeaders.values.has("x-goog-api-key")) {
       return void 0;
-    });
+    }
+    if (this.apiKey) {
+      return buildHeaders([{ "x-goog-api-key": this.apiKey }]);
+    }
+    if (this.clientAdapter.isVertexAI()) {
+      return buildHeaders([await this.clientAdapter.getAuthHeaders()]);
+    }
+    return void 0;
   }
   /**
    * Basic re-implementation of `qs.stringify` for primitive types.
@@ -15168,13 +14987,11 @@ var BaseGeminiNextGenAPIClient = class _BaseGeminiNextGenAPIClient {
      * Used as a callback for mutating the given `FinalRequestOptions` object.
   
      */
-  prepareOptions(options) {
-    return __async(this, null, function* () {
-      if (this.clientAdapter && this.clientAdapter.isVertexAI() && !options.path.startsWith(`/${this.apiVersion}/projects/`)) {
-        const oldPath = options.path.slice(this.apiVersion.length + 1);
-        options.path = `/${this.apiVersion}/projects/${this.clientAdapter.getProject()}/locations/${this.clientAdapter.getLocation()}${oldPath}`;
-      }
-    });
+  async prepareOptions(options) {
+    if (this.clientAdapter && this.clientAdapter.isVertexAI() && !options.path.startsWith(`/${this.apiVersion}/projects/`)) {
+      const oldPath = options.path.slice(this.apiVersion.length + 1);
+      options.path = `/${this.apiVersion}/projects/${this.clientAdapter.getProject()}/locations/${this.clientAdapter.getLocation()}${oldPath}`;
+    }
   }
   /**
    * Used as a callback for mutating the given `RequestInit` object.
@@ -15182,9 +14999,7 @@ var BaseGeminiNextGenAPIClient = class _BaseGeminiNextGenAPIClient {
    * This is useful for cases where you want to add certain headers based off of
    * the request properties, e.g. `method` or `url`.
    */
-  prepareRequest(_0, _1) {
-    return __async(this, arguments, function* (request, { url, options }) {
-    });
+  async prepareRequest(request, { url, options }) {
   }
   get(path2, opts) {
     return this.methodRequest("get", path2, opts);
@@ -15209,169 +15024,161 @@ var BaseGeminiNextGenAPIClient = class _BaseGeminiNextGenAPIClient {
   request(options, remainingRetries = null) {
     return new APIPromise(this, this.makeRequest(options, remainingRetries, void 0));
   }
-  makeRequest(optionsInput, retriesRemaining, retryOfRequestLogID) {
-    return __async(this, null, function* () {
-      var _b, _c, _d;
-      const options = yield optionsInput;
-      const maxRetries = (_b = options.maxRetries) !== null && _b !== void 0 ? _b : this.maxRetries;
-      if (retriesRemaining == null) {
-        retriesRemaining = maxRetries;
-      }
-      yield this.prepareOptions(options);
-      const { req, url, timeout } = yield this.buildRequest(options, {
-        retryCount: maxRetries - retriesRemaining
-      });
-      yield this.prepareRequest(req, { url, options });
-      const requestLogID = "log_" + (Math.random() * (1 << 24) | 0).toString(16).padStart(6, "0");
-      const retryLogStr = retryOfRequestLogID === void 0 ? "" : `, retryOf: ${retryOfRequestLogID}`;
-      const startTime = Date.now();
-      loggerFor(this).debug(`[${requestLogID}] sending request`, formatRequestDetails({
-        retryOfRequestLogID,
-        method: options.method,
-        url,
-        options,
-        headers: req.headers
-      }));
-      if ((_c = options.signal) === null || _c === void 0 ? void 0 : _c.aborted) {
+  async makeRequest(optionsInput, retriesRemaining, retryOfRequestLogID) {
+    var _b, _c, _d;
+    const options = await optionsInput;
+    const maxRetries = (_b = options.maxRetries) !== null && _b !== void 0 ? _b : this.maxRetries;
+    if (retriesRemaining == null) {
+      retriesRemaining = maxRetries;
+    }
+    await this.prepareOptions(options);
+    const { req, url, timeout } = await this.buildRequest(options, {
+      retryCount: maxRetries - retriesRemaining
+    });
+    await this.prepareRequest(req, { url, options });
+    const requestLogID = "log_" + (Math.random() * (1 << 24) | 0).toString(16).padStart(6, "0");
+    const retryLogStr = retryOfRequestLogID === void 0 ? "" : `, retryOf: ${retryOfRequestLogID}`;
+    const startTime = Date.now();
+    loggerFor(this).debug(`[${requestLogID}] sending request`, formatRequestDetails({
+      retryOfRequestLogID,
+      method: options.method,
+      url,
+      options,
+      headers: req.headers
+    }));
+    if ((_c = options.signal) === null || _c === void 0 ? void 0 : _c.aborted) {
+      throw new APIUserAbortError();
+    }
+    const controller = new AbortController();
+    const response = await this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
+    const headersTime = Date.now();
+    if (response instanceof globalThis.Error) {
+      const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
+      if ((_d = options.signal) === null || _d === void 0 ? void 0 : _d.aborted) {
         throw new APIUserAbortError();
       }
-      const controller = new AbortController();
-      const response = yield this.fetchWithTimeout(url, req, timeout, controller).catch(castToError);
-      const headersTime = Date.now();
-      if (response instanceof globalThis.Error) {
-        const retryMessage = `retrying, ${retriesRemaining} attempts remaining`;
-        if ((_d = options.signal) === null || _d === void 0 ? void 0 : _d.aborted) {
-          throw new APIUserAbortError();
-        }
-        const isTimeout = isAbortError(response) || /timed? ?out/i.test(String(response) + ("cause" in response ? String(response.cause) : ""));
-        if (retriesRemaining) {
-          loggerFor(this).info(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} - ${retryMessage}`);
-          loggerFor(this).debug(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} (${retryMessage})`, formatRequestDetails({
-            retryOfRequestLogID,
-            url,
-            durationMs: headersTime - startTime,
-            message: response.message
-          }));
-          return this.retryRequest(options, retriesRemaining, retryOfRequestLogID !== null && retryOfRequestLogID !== void 0 ? retryOfRequestLogID : requestLogID);
-        }
-        loggerFor(this).info(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} - error; no more retries left`);
-        loggerFor(this).debug(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} (error; no more retries left)`, formatRequestDetails({
+      const isTimeout = isAbortError(response) || /timed? ?out/i.test(String(response) + ("cause" in response ? String(response.cause) : ""));
+      if (retriesRemaining) {
+        loggerFor(this).info(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} - ${retryMessage}`);
+        loggerFor(this).debug(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} (${retryMessage})`, formatRequestDetails({
           retryOfRequestLogID,
           url,
           durationMs: headersTime - startTime,
           message: response.message
         }));
-        if (isTimeout) {
-          throw new APIConnectionTimeoutError();
-        }
-        throw new APIConnectionError({ cause: response });
+        return this.retryRequest(options, retriesRemaining, retryOfRequestLogID !== null && retryOfRequestLogID !== void 0 ? retryOfRequestLogID : requestLogID);
       }
-      const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${response.ok ? "succeeded" : "failed"} with status ${response.status} in ${headersTime - startTime}ms`;
-      if (!response.ok) {
-        const shouldRetry = yield this.shouldRetry(response);
-        if (retriesRemaining && shouldRetry) {
-          const retryMessage2 = `retrying, ${retriesRemaining} attempts remaining`;
-          yield CancelReadableStream(response.body);
-          loggerFor(this).info(`${responseInfo} - ${retryMessage2}`);
-          loggerFor(this).debug(`[${requestLogID}] response error (${retryMessage2})`, formatRequestDetails({
-            retryOfRequestLogID,
-            url: response.url,
-            status: response.status,
-            headers: response.headers,
-            durationMs: headersTime - startTime
-          }));
-          return this.retryRequest(options, retriesRemaining, retryOfRequestLogID !== null && retryOfRequestLogID !== void 0 ? retryOfRequestLogID : requestLogID, response.headers);
-        }
-        const retryMessage = shouldRetry ? `error; no more retries left` : `error; not retryable`;
-        loggerFor(this).info(`${responseInfo} - ${retryMessage}`);
-        const errText = yield response.text().catch((err2) => castToError(err2).message);
-        const errJSON = safeJSON(errText);
-        const errMessage = errJSON ? void 0 : errText;
-        loggerFor(this).debug(`[${requestLogID}] response error (${retryMessage})`, formatRequestDetails({
+      loggerFor(this).info(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} - error; no more retries left`);
+      loggerFor(this).debug(`[${requestLogID}] connection ${isTimeout ? "timed out" : "failed"} (error; no more retries left)`, formatRequestDetails({
+        retryOfRequestLogID,
+        url,
+        durationMs: headersTime - startTime,
+        message: response.message
+      }));
+      if (isTimeout) {
+        throw new APIConnectionTimeoutError();
+      }
+      throw new APIConnectionError({ cause: response });
+    }
+    const responseInfo = `[${requestLogID}${retryLogStr}] ${req.method} ${url} ${response.ok ? "succeeded" : "failed"} with status ${response.status} in ${headersTime - startTime}ms`;
+    if (!response.ok) {
+      const shouldRetry = await this.shouldRetry(response);
+      if (retriesRemaining && shouldRetry) {
+        const retryMessage2 = `retrying, ${retriesRemaining} attempts remaining`;
+        await CancelReadableStream(response.body);
+        loggerFor(this).info(`${responseInfo} - ${retryMessage2}`);
+        loggerFor(this).debug(`[${requestLogID}] response error (${retryMessage2})`, formatRequestDetails({
           retryOfRequestLogID,
           url: response.url,
           status: response.status,
           headers: response.headers,
-          message: errMessage,
-          durationMs: Date.now() - startTime
+          durationMs: headersTime - startTime
         }));
-        const err = this.makeStatusError(response.status, errJSON, errMessage, response.headers);
-        throw err;
+        return this.retryRequest(options, retriesRemaining, retryOfRequestLogID !== null && retryOfRequestLogID !== void 0 ? retryOfRequestLogID : requestLogID, response.headers);
       }
-      loggerFor(this).info(responseInfo);
-      loggerFor(this).debug(`[${requestLogID}] response start`, formatRequestDetails({
+      const retryMessage = shouldRetry ? `error; no more retries left` : `error; not retryable`;
+      loggerFor(this).info(`${responseInfo} - ${retryMessage}`);
+      const errText = await response.text().catch((err2) => castToError(err2).message);
+      const errJSON = safeJSON(errText);
+      const errMessage = errJSON ? void 0 : errText;
+      loggerFor(this).debug(`[${requestLogID}] response error (${retryMessage})`, formatRequestDetails({
         retryOfRequestLogID,
         url: response.url,
         status: response.status,
         headers: response.headers,
-        durationMs: headersTime - startTime
+        message: errMessage,
+        durationMs: Date.now() - startTime
       }));
-      return { response, options, controller, requestLogID, retryOfRequestLogID, startTime };
-    });
+      const err = this.makeStatusError(response.status, errJSON, errMessage, response.headers);
+      throw err;
+    }
+    loggerFor(this).info(responseInfo);
+    loggerFor(this).debug(`[${requestLogID}] response start`, formatRequestDetails({
+      retryOfRequestLogID,
+      url: response.url,
+      status: response.status,
+      headers: response.headers,
+      durationMs: headersTime - startTime
+    }));
+    return { response, options, controller, requestLogID, retryOfRequestLogID, startTime };
   }
-  fetchWithTimeout(url, init, ms, controller) {
-    return __async(this, null, function* () {
-      const _b = init || {}, { signal, method } = _b, options = __rest(_b, ["signal", "method"]);
-      if (signal)
-        signal.addEventListener("abort", () => controller.abort());
-      const timeout = setTimeout(() => controller.abort(), ms);
-      const isReadableBody = globalThis.ReadableStream && options.body instanceof globalThis.ReadableStream || typeof options.body === "object" && options.body !== null && Symbol.asyncIterator in options.body;
-      const fetchOptions = Object.assign(Object.assign(Object.assign({ signal: controller.signal }, isReadableBody ? { duplex: "half" } : {}), { method: "GET" }), options);
-      if (method) {
-        fetchOptions.method = method.toUpperCase();
-      }
-      try {
-        return yield this.fetch.call(void 0, url, fetchOptions);
-      } finally {
-        clearTimeout(timeout);
-      }
-    });
+  async fetchWithTimeout(url, init, ms, controller) {
+    const _b = init || {}, { signal, method } = _b, options = __rest(_b, ["signal", "method"]);
+    if (signal)
+      signal.addEventListener("abort", () => controller.abort());
+    const timeout = setTimeout(() => controller.abort(), ms);
+    const isReadableBody = globalThis.ReadableStream && options.body instanceof globalThis.ReadableStream || typeof options.body === "object" && options.body !== null && Symbol.asyncIterator in options.body;
+    const fetchOptions = Object.assign(Object.assign(Object.assign({ signal: controller.signal }, isReadableBody ? { duplex: "half" } : {}), { method: "GET" }), options);
+    if (method) {
+      fetchOptions.method = method.toUpperCase();
+    }
+    try {
+      return await this.fetch.call(void 0, url, fetchOptions);
+    } finally {
+      clearTimeout(timeout);
+    }
   }
-  shouldRetry(response) {
-    return __async(this, null, function* () {
-      const shouldRetryHeader = response.headers.get("x-should-retry");
-      if (shouldRetryHeader === "true")
-        return true;
-      if (shouldRetryHeader === "false")
-        return false;
-      if (response.status === 408)
-        return true;
-      if (response.status === 409)
-        return true;
-      if (response.status === 429)
-        return true;
-      if (response.status >= 500)
-        return true;
+  async shouldRetry(response) {
+    const shouldRetryHeader = response.headers.get("x-should-retry");
+    if (shouldRetryHeader === "true")
+      return true;
+    if (shouldRetryHeader === "false")
       return false;
-    });
+    if (response.status === 408)
+      return true;
+    if (response.status === 409)
+      return true;
+    if (response.status === 429)
+      return true;
+    if (response.status >= 500)
+      return true;
+    return false;
   }
-  retryRequest(options, retriesRemaining, requestLogID, responseHeaders) {
-    return __async(this, null, function* () {
-      var _b;
-      let timeoutMillis;
-      const retryAfterMillisHeader = responseHeaders === null || responseHeaders === void 0 ? void 0 : responseHeaders.get("retry-after-ms");
-      if (retryAfterMillisHeader) {
-        const timeoutMs = parseFloat(retryAfterMillisHeader);
-        if (!Number.isNaN(timeoutMs)) {
-          timeoutMillis = timeoutMs;
-        }
+  async retryRequest(options, retriesRemaining, requestLogID, responseHeaders) {
+    var _b;
+    let timeoutMillis;
+    const retryAfterMillisHeader = responseHeaders === null || responseHeaders === void 0 ? void 0 : responseHeaders.get("retry-after-ms");
+    if (retryAfterMillisHeader) {
+      const timeoutMs = parseFloat(retryAfterMillisHeader);
+      if (!Number.isNaN(timeoutMs)) {
+        timeoutMillis = timeoutMs;
       }
-      const retryAfterHeader = responseHeaders === null || responseHeaders === void 0 ? void 0 : responseHeaders.get("retry-after");
-      if (retryAfterHeader && !timeoutMillis) {
-        const timeoutSeconds = parseFloat(retryAfterHeader);
-        if (!Number.isNaN(timeoutSeconds)) {
-          timeoutMillis = timeoutSeconds * 1e3;
-        } else {
-          timeoutMillis = Date.parse(retryAfterHeader) - Date.now();
-        }
+    }
+    const retryAfterHeader = responseHeaders === null || responseHeaders === void 0 ? void 0 : responseHeaders.get("retry-after");
+    if (retryAfterHeader && !timeoutMillis) {
+      const timeoutSeconds = parseFloat(retryAfterHeader);
+      if (!Number.isNaN(timeoutSeconds)) {
+        timeoutMillis = timeoutSeconds * 1e3;
+      } else {
+        timeoutMillis = Date.parse(retryAfterHeader) - Date.now();
       }
-      if (!(timeoutMillis && 0 <= timeoutMillis && timeoutMillis < 60 * 1e3)) {
-        const maxRetries = (_b = options.maxRetries) !== null && _b !== void 0 ? _b : this.maxRetries;
-        timeoutMillis = this.calculateDefaultRetryTimeoutMillis(retriesRemaining, maxRetries);
-      }
-      yield sleep$1(timeoutMillis);
-      return this.makeRequest(options, retriesRemaining - 1, requestLogID);
-    });
+    }
+    if (!(timeoutMillis && 0 <= timeoutMillis && timeoutMillis < 60 * 1e3)) {
+      const maxRetries = (_b = options.maxRetries) !== null && _b !== void 0 ? _b : this.maxRetries;
+      timeoutMillis = this.calculateDefaultRetryTimeoutMillis(retriesRemaining, maxRetries);
+    }
+    await sleep$1(timeoutMillis);
+    return this.makeRequest(options, retriesRemaining - 1, requestLogID);
   }
   calculateDefaultRetryTimeoutMillis(retriesRemaining, maxRetries) {
     const initialRetryDelay = 0.5;
@@ -15381,41 +15188,37 @@ var BaseGeminiNextGenAPIClient = class _BaseGeminiNextGenAPIClient {
     const jitter = 1 - Math.random() * 0.25;
     return sleepSeconds * jitter * 1e3;
   }
-  buildRequest(_0) {
-    return __async(this, arguments, function* (inputOptions, { retryCount = 0 } = {}) {
-      var _b, _c, _d;
-      const options = Object.assign({}, inputOptions);
-      const { method, path: path2, query, defaultBaseURL } = options;
-      const url = this.buildURL(path2, query, defaultBaseURL);
-      if ("timeout" in options)
-        validatePositiveInteger("timeout", options.timeout);
-      options.timeout = (_b = options.timeout) !== null && _b !== void 0 ? _b : this.timeout;
-      const { bodyHeaders, body } = this.buildBody({ options });
-      const reqHeaders = yield this.buildHeaders({ options: inputOptions, method, bodyHeaders, retryCount });
-      const req = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ method, headers: reqHeaders }, options.signal && { signal: options.signal }), globalThis.ReadableStream && body instanceof globalThis.ReadableStream && { duplex: "half" }), body && { body }), (_c = this.fetchOptions) !== null && _c !== void 0 ? _c : {}), (_d = options.fetchOptions) !== null && _d !== void 0 ? _d : {});
-      return { req, url, timeout: options.timeout };
-    });
+  async buildRequest(inputOptions, { retryCount = 0 } = {}) {
+    var _b, _c, _d;
+    const options = Object.assign({}, inputOptions);
+    const { method, path: path2, query, defaultBaseURL } = options;
+    const url = this.buildURL(path2, query, defaultBaseURL);
+    if ("timeout" in options)
+      validatePositiveInteger("timeout", options.timeout);
+    options.timeout = (_b = options.timeout) !== null && _b !== void 0 ? _b : this.timeout;
+    const { bodyHeaders, body } = this.buildBody({ options });
+    const reqHeaders = await this.buildHeaders({ options: inputOptions, method, bodyHeaders, retryCount });
+    const req = Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({ method, headers: reqHeaders }, options.signal && { signal: options.signal }), globalThis.ReadableStream && body instanceof globalThis.ReadableStream && { duplex: "half" }), body && { body }), (_c = this.fetchOptions) !== null && _c !== void 0 ? _c : {}), (_d = options.fetchOptions) !== null && _d !== void 0 ? _d : {});
+    return { req, url, timeout: options.timeout };
   }
-  buildHeaders(_0) {
-    return __async(this, arguments, function* ({ options, method, bodyHeaders, retryCount }) {
-      let idempotencyHeaders = {};
-      if (this.idempotencyHeader && method !== "get") {
-        if (!options.idempotencyKey)
-          options.idempotencyKey = this.defaultIdempotencyKey();
-        idempotencyHeaders[this.idempotencyHeader] = options.idempotencyKey;
-      }
-      const authHeaders = yield this.authHeaders(options);
-      let headers = buildHeaders([
-        idempotencyHeaders,
-        Object.assign(Object.assign({ Accept: "application/json", "User-Agent": this.getUserAgent(), "X-Stainless-Retry-Count": String(retryCount) }, options.timeout ? { "X-Stainless-Timeout": String(Math.trunc(options.timeout / 1e3)) } : {}), getPlatformHeaders()),
-        this._options.defaultHeaders,
-        bodyHeaders,
-        options.headers,
-        authHeaders
-      ]);
-      this.validateHeaders(headers);
-      return headers.values;
-    });
+  async buildHeaders({ options, method, bodyHeaders, retryCount }) {
+    let idempotencyHeaders = {};
+    if (this.idempotencyHeader && method !== "get") {
+      if (!options.idempotencyKey)
+        options.idempotencyKey = this.defaultIdempotencyKey();
+      idempotencyHeaders[this.idempotencyHeader] = options.idempotencyKey;
+    }
+    const authHeaders = await this.authHeaders(options);
+    let headers = buildHeaders([
+      idempotencyHeaders,
+      Object.assign(Object.assign({ Accept: "application/json", "User-Agent": this.getUserAgent(), "X-Stainless-Retry-Count": String(retryCount) }, options.timeout ? { "X-Stainless-Timeout": String(Math.trunc(options.timeout / 1e3)) } : {}), getPlatformHeaders()),
+      this._options.defaultHeaders,
+      bodyHeaders,
+      options.headers,
+      authHeaders
+    ]);
+    this.validateHeaders(headers);
+    return headers.values;
   }
   buildBody({ options: { body, headers: rawHeaders } }) {
     if (!body) {
@@ -16144,13 +15947,13 @@ var Tunings = class extends BaseModule {
   constructor(apiClient) {
     super();
     this.apiClient = apiClient;
-    this.list = (..._0) => __async(this, [..._0], function* (params = {}) {
-      return new Pager(PagedItem.PAGED_ITEM_TUNING_JOBS, (x) => this.listInternal(x), yield this.listInternal(params), params);
-    });
-    this.get = (params) => __async(this, null, function* () {
-      return yield this.getInternal(params);
-    });
-    this.tune = (params) => __async(this, null, function* () {
+    this.list = async (params = {}) => {
+      return new Pager(PagedItem.PAGED_ITEM_TUNING_JOBS, (x) => this.listInternal(x), await this.listInternal(params), params);
+    };
+    this.get = async (params) => {
+      return await this.getInternal(params);
+    };
+    this.tune = async (params) => {
       var _a2;
       if (this.apiClient.isVertexAI()) {
         if (params.baseModel.startsWith("projects/")) {
@@ -16162,14 +15965,14 @@ var Tunings = class extends BaseModule {
           }
           const paramsPrivate = Object.assign(Object.assign({}, params), { preTunedModel });
           paramsPrivate.baseModel = void 0;
-          return yield this.tuneInternal(paramsPrivate);
+          return await this.tuneInternal(paramsPrivate);
         } else {
           const paramsPrivate = Object.assign({}, params);
-          return yield this.tuneInternal(paramsPrivate);
+          return await this.tuneInternal(paramsPrivate);
         }
       } else {
         const paramsPrivate = Object.assign({}, params);
-        const operation = yield this.tuneMldevInternal(paramsPrivate);
+        const operation = await this.tuneMldevInternal(paramsPrivate);
         let tunedModelName = "";
         if (operation["metadata"] !== void 0 && operation["metadata"]["tunedModel"] !== void 0) {
           tunedModelName = operation["metadata"]["tunedModel"];
@@ -16182,133 +15985,129 @@ var Tunings = class extends BaseModule {
         };
         return tuningJob;
       }
-    });
+    };
   }
-  getInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = getTuningJobParametersToVertex(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async getInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = getTuningJobParametersToVertex(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = tuningJobFromVertex(apiResponse);
-          return resp;
+      });
+      return response.then((apiResponse) => {
+        const resp = tuningJobFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      const body = getTuningJobParametersToMldev(params);
+      path2 = formatMap("{name}", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = getTuningJobParametersToMldev(params);
-        path2 = formatMap("{name}", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = tuningJobFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = tuningJobFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
-  listInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = listTuningJobsParametersToVertex(params);
-        path2 = formatMap("tuningJobs", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async listInternal(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = listTuningJobsParametersToVertex(params);
+      path2 = formatMap("tuningJobs", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = listTuningJobsResponseFromVertex(apiResponse);
-          const typedResp = new ListTuningJobsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = listTuningJobsResponseFromVertex(apiResponse);
+        const typedResp = new ListTuningJobsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = listTuningJobsParametersToMldev(params);
+      path2 = formatMap("tunedModels", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "GET",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = listTuningJobsParametersToMldev(params);
-        path2 = formatMap("tunedModels", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "GET",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = listTuningJobsResponseFromMldev(apiResponse);
-          const typedResp = new ListTuningJobsResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = listTuningJobsResponseFromMldev(apiResponse);
+        const typedResp = new ListTuningJobsResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
   /**
    * Cancels a tuning job.
@@ -16321,151 +16120,143 @@ var Tunings = class extends BaseModule {
    * await ai.tunings.cancel({name: '...'}); // The server-generated resource name.
    * ```
    */
-  cancel(params) {
-    return __async(this, null, function* () {
-      var _a2, _b, _c, _d;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = cancelTuningJobParametersToVertex(params);
-        path2 = formatMap("{name}:cancel", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async cancel(params) {
+    var _a2, _b, _c, _d;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = cancelTuningJobParametersToVertex(params);
+      path2 = formatMap("{name}:cancel", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = cancelTuningJobResponseFromVertex(apiResponse);
-          const typedResp = new CancelTuningJobResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
+      });
+      return response.then((apiResponse) => {
+        const resp = cancelTuningJobResponseFromVertex(apiResponse);
+        const typedResp = new CancelTuningJobResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    } else {
+      const body = cancelTuningJobParametersToMldev(params);
+      path2 = formatMap("{name}:cancel", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
+        abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-      } else {
-        const body = cancelTuningJobParametersToMldev(params);
-        path2 = formatMap("{name}:cancel", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_c = params.config) === null || _c === void 0 ? void 0 : _c.httpOptions,
-          abortSignal: (_d = params.config) === null || _d === void 0 ? void 0 : _d.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
-        });
-        return response.then((apiResponse) => {
-          const resp = cancelTuningJobResponseFromMldev(apiResponse);
-          const typedResp = new CancelTuningJobResponse();
-          Object.assign(typedResp, resp);
-          return typedResp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = cancelTuningJobResponseFromMldev(apiResponse);
+        const typedResp = new CancelTuningJobResponse();
+        Object.assign(typedResp, resp);
+        return typedResp;
+      });
+    }
   }
-  tuneInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        const body = createTuningJobParametersPrivateToVertex(params, params);
-        path2 = formatMap("tuningJobs", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async tuneInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      const body = createTuningJobParametersPrivateToVertex(params, params);
+      path2 = formatMap("tuningJobs", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = tuningJobFromVertex(apiResponse);
-          return resp;
-        });
-      } else {
-        throw new Error("This method is only supported by the Vertex AI.");
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = tuningJobFromVertex(apiResponse);
+        return resp;
+      });
+    } else {
+      throw new Error("This method is only supported by the Vertex AI.");
+    }
   }
-  tuneMldevInternal(params) {
-    return __async(this, null, function* () {
-      var _a2, _b;
-      let response;
-      let path2 = "";
-      let queryParams = {};
-      if (this.apiClient.isVertexAI()) {
-        throw new Error("This method is only supported by the Gemini Developer API.");
-      } else {
-        const body = createTuningJobParametersPrivateToMldev(params);
-        path2 = formatMap("tunedModels", body["_url"]);
-        queryParams = body["_query"];
-        delete body["_url"];
-        delete body["_query"];
-        response = this.apiClient.request({
-          path: path2,
-          queryParams,
-          body: JSON.stringify(body),
-          httpMethod: "POST",
-          httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
-          abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
-        }).then((httpResponse) => {
-          return httpResponse.json().then((jsonResponse) => {
-            const response2 = jsonResponse;
-            response2.sdkHttpResponse = {
-              headers: httpResponse.headers
-            };
-            return response2;
-          });
+  async tuneMldevInternal(params) {
+    var _a2, _b;
+    let response;
+    let path2 = "";
+    let queryParams = {};
+    if (this.apiClient.isVertexAI()) {
+      throw new Error("This method is only supported by the Gemini Developer API.");
+    } else {
+      const body = createTuningJobParametersPrivateToMldev(params);
+      path2 = formatMap("tunedModels", body["_url"]);
+      queryParams = body["_query"];
+      delete body["_url"];
+      delete body["_query"];
+      response = this.apiClient.request({
+        path: path2,
+        queryParams,
+        body: JSON.stringify(body),
+        httpMethod: "POST",
+        httpOptions: (_a2 = params.config) === null || _a2 === void 0 ? void 0 : _a2.httpOptions,
+        abortSignal: (_b = params.config) === null || _b === void 0 ? void 0 : _b.abortSignal
+      }).then((httpResponse) => {
+        return httpResponse.json().then((jsonResponse) => {
+          const response2 = jsonResponse;
+          response2.sdkHttpResponse = {
+            headers: httpResponse.headers
+          };
+          return response2;
         });
-        return response.then((apiResponse) => {
-          const resp = tuningOperationFromMldev(apiResponse);
-          return resp;
-        });
-      }
-    });
+      });
+      return response.then((apiResponse) => {
+        const resp = tuningOperationFromMldev(apiResponse);
+        return resp;
+      });
+    }
   }
 };
 var BrowserDownloader = class {
-  download(_params, _apiClient) {
-    return __async(this, null, function* () {
-      throw new Error("Download to file is not supported in the browser, please use a browser compliant download like an <a> tag.");
-    });
+  async download(_params, _apiClient) {
+    throw new Error("Download to file is not supported in the browser, please use a browser compliant download like an <a> tag.");
   }
 };
 var MAX_CHUNK_SIZE = 1024 * 1024 * 8;
@@ -16473,114 +16264,100 @@ var MAX_RETRY_COUNT = 3;
 var INITIAL_RETRY_DELAY_MS = 1e3;
 var DELAY_MULTIPLIER = 2;
 var X_GOOG_UPLOAD_STATUS_HEADER_FIELD = "x-goog-upload-status";
-function uploadBlob(file, uploadUrl, apiClient) {
-  return __async(this, null, function* () {
-    var _a2;
-    const response = yield uploadBlobInternal(file, uploadUrl, apiClient);
-    const responseJson = yield response === null || response === void 0 ? void 0 : response.json();
-    if (((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "final") {
-      throw new Error("Failed to upload file: Upload status is not finalized.");
-    }
-    return responseJson["file"];
-  });
+async function uploadBlob(file, uploadUrl, apiClient) {
+  var _a2;
+  const response = await uploadBlobInternal(file, uploadUrl, apiClient);
+  const responseJson = await (response === null || response === void 0 ? void 0 : response.json());
+  if (((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "final") {
+    throw new Error("Failed to upload file: Upload status is not finalized.");
+  }
+  return responseJson["file"];
 }
-function uploadBlobToFileSearchStore(file, uploadUrl, apiClient) {
-  return __async(this, null, function* () {
-    var _a2;
-    const response = yield uploadBlobInternal(file, uploadUrl, apiClient);
-    const responseJson = yield response === null || response === void 0 ? void 0 : response.json();
-    if (((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "final") {
-      throw new Error("Failed to upload file: Upload status is not finalized.");
-    }
-    const resp = uploadToFileSearchStoreOperationFromMldev(responseJson);
-    const typedResp = new UploadToFileSearchStoreOperation();
-    Object.assign(typedResp, resp);
-    return typedResp;
-  });
+async function uploadBlobToFileSearchStore(file, uploadUrl, apiClient) {
+  var _a2;
+  const response = await uploadBlobInternal(file, uploadUrl, apiClient);
+  const responseJson = await (response === null || response === void 0 ? void 0 : response.json());
+  if (((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "final") {
+    throw new Error("Failed to upload file: Upload status is not finalized.");
+  }
+  const resp = uploadToFileSearchStoreOperationFromMldev(responseJson);
+  const typedResp = new UploadToFileSearchStoreOperation();
+  Object.assign(typedResp, resp);
+  return typedResp;
 }
-function uploadBlobInternal(file, uploadUrl, apiClient) {
-  return __async(this, null, function* () {
-    var _a2, _b;
-    let fileSize = 0;
-    let offset = 0;
-    let response = new HttpResponse(new Response());
-    let uploadCommand = "upload";
-    fileSize = file.size;
-    while (offset < fileSize) {
-      const chunkSize = Math.min(MAX_CHUNK_SIZE, fileSize - offset);
-      const chunk = file.slice(offset, offset + chunkSize);
-      if (offset + chunkSize >= fileSize) {
-        uploadCommand += ", finalize";
-      }
-      let retryCount = 0;
-      let currentDelayMs = INITIAL_RETRY_DELAY_MS;
-      while (retryCount < MAX_RETRY_COUNT) {
-        response = yield apiClient.request({
-          path: "",
-          body: chunk,
-          httpMethod: "POST",
-          httpOptions: {
-            apiVersion: "",
-            baseUrl: uploadUrl,
-            headers: {
-              "X-Goog-Upload-Command": uploadCommand,
-              "X-Goog-Upload-Offset": String(offset),
-              "Content-Length": String(chunkSize)
-            }
+async function uploadBlobInternal(file, uploadUrl, apiClient) {
+  var _a2, _b;
+  let fileSize = 0;
+  let offset = 0;
+  let response = new HttpResponse(new Response());
+  let uploadCommand = "upload";
+  fileSize = file.size;
+  while (offset < fileSize) {
+    const chunkSize = Math.min(MAX_CHUNK_SIZE, fileSize - offset);
+    const chunk = file.slice(offset, offset + chunkSize);
+    if (offset + chunkSize >= fileSize) {
+      uploadCommand += ", finalize";
+    }
+    let retryCount = 0;
+    let currentDelayMs = INITIAL_RETRY_DELAY_MS;
+    while (retryCount < MAX_RETRY_COUNT) {
+      response = await apiClient.request({
+        path: "",
+        body: chunk,
+        httpMethod: "POST",
+        httpOptions: {
+          apiVersion: "",
+          baseUrl: uploadUrl,
+          headers: {
+            "X-Goog-Upload-Command": uploadCommand,
+            "X-Goog-Upload-Offset": String(offset),
+            "Content-Length": String(chunkSize)
           }
-        });
-        if ((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) {
-          break;
         }
-        retryCount++;
-        yield sleep(currentDelayMs);
-        currentDelayMs = currentDelayMs * DELAY_MULTIPLIER;
-      }
-      offset += chunkSize;
-      if (((_b = response === null || response === void 0 ? void 0 : response.headers) === null || _b === void 0 ? void 0 : _b[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "active") {
+      });
+      if ((_a2 = response === null || response === void 0 ? void 0 : response.headers) === null || _a2 === void 0 ? void 0 : _a2[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) {
         break;
       }
-      if (fileSize <= offset) {
-        throw new Error("All content has been uploaded, but the upload status is not finalized.");
-      }
+      retryCount++;
+      await sleep(currentDelayMs);
+      currentDelayMs = currentDelayMs * DELAY_MULTIPLIER;
     }
-    return response;
-  });
+    offset += chunkSize;
+    if (((_b = response === null || response === void 0 ? void 0 : response.headers) === null || _b === void 0 ? void 0 : _b[X_GOOG_UPLOAD_STATUS_HEADER_FIELD]) !== "active") {
+      break;
+    }
+    if (fileSize <= offset) {
+      throw new Error("All content has been uploaded, but the upload status is not finalized.");
+    }
+  }
+  return response;
 }
-function getBlobStat(file) {
-  return __async(this, null, function* () {
-    const fileStat = { size: file.size, type: file.type };
-    return fileStat;
-  });
+async function getBlobStat(file) {
+  const fileStat = { size: file.size, type: file.type };
+  return fileStat;
 }
 function sleep(ms) {
   return new Promise((resolvePromise) => setTimeout(resolvePromise, ms));
 }
 var BrowserUploader = class {
-  upload(file, uploadUrl, apiClient) {
-    return __async(this, null, function* () {
-      if (typeof file === "string") {
-        throw new Error("File path is not supported in browser uploader.");
-      }
-      return yield uploadBlob(file, uploadUrl, apiClient);
-    });
+  async upload(file, uploadUrl, apiClient) {
+    if (typeof file === "string") {
+      throw new Error("File path is not supported in browser uploader.");
+    }
+    return await uploadBlob(file, uploadUrl, apiClient);
   }
-  uploadToFileSearchStore(file, uploadUrl, apiClient) {
-    return __async(this, null, function* () {
-      if (typeof file === "string") {
-        throw new Error("File path is not supported in browser uploader.");
-      }
-      return yield uploadBlobToFileSearchStore(file, uploadUrl, apiClient);
-    });
+  async uploadToFileSearchStore(file, uploadUrl, apiClient) {
+    if (typeof file === "string") {
+      throw new Error("File path is not supported in browser uploader.");
+    }
+    return await uploadBlobToFileSearchStore(file, uploadUrl, apiClient);
   }
-  stat(file) {
-    return __async(this, null, function* () {
-      if (typeof file === "string") {
-        throw new Error("File path is not supported in browser uploader.");
-      } else {
-        return yield getBlobStat(file);
-      }
-    });
+  async stat(file) {
+    if (typeof file === "string") {
+      throw new Error("File path is not supported in browser uploader.");
+    } else {
+      return await getBlobStat(file);
+    }
   }
 };
 var BrowserWebSocketFactory = class {
@@ -16620,19 +16397,17 @@ var WebAuth = class {
     this.apiKey = apiKey;
   }
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  addAuthHeaders(headers, url) {
-    return __async(this, null, function* () {
-      if (headers.get(GOOGLE_API_KEY_HEADER) !== null) {
-        return;
-      }
-      if (this.apiKey.startsWith("auth_tokens/")) {
-        throw new Error("Ephemeral tokens are only supported by the live API.");
-      }
-      if (!this.apiKey) {
-        throw new Error("API key is missing. Please provide a valid API key.");
-      }
-      headers.append(GOOGLE_API_KEY_HEADER, this.apiKey);
-    });
+  async addAuthHeaders(headers, url) {
+    if (headers.get(GOOGLE_API_KEY_HEADER) !== null) {
+      return;
+    }
+    if (this.apiKey.startsWith("auth_tokens/")) {
+      throw new Error("Ephemeral tokens are only supported by the live API.");
+    }
+    if (!this.apiKey) {
+      throw new Error("API key is missing. Please provide a valid API key.");
+    }
+    headers.append(GOOGLE_API_KEY_HEADER, this.apiKey);
   }
 };
 var LANGUAGE_LABEL_PREFIX = "gl-node/";
