@@ -1,5 +1,5 @@
 
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { StoreService } from '../services/store.service';
 import { PdfService } from '../services/pdf.service';
@@ -8,6 +8,7 @@ import { AiService } from '../services/ai.service';
 @Component({
   selector: 'app-settings',
   imports: [CommonModule],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="px-5 pt-12 pb-24 space-y-8 max-w-md mx-auto">
       <header>
@@ -108,19 +109,39 @@ import { AiService } from '../services/ai.service';
           <div class="w-10 h-10 rounded-2xl bg-amber-50 flex items-center justify-center text-amber-600 shadow-sm">
             <i class="fas fa-database"></i>
           </div>
-          <h3 class="font-bold text-gray-800 text-lg">Backup e JSON</h3>
+          <h3 class="font-bold text-gray-800 text-lg">Gestione Backup</h3>
         </div>
         
-        <div class="grid grid-cols-2 gap-4">
-          <button (click)="store.exportFullBackup()" class="flex flex-col items-center bg-white p-5 rounded-[28px] border border-gray-100 shadow-sm active:bg-gray-50 active:scale-95 transition-all">
-            <i class="fas fa-archive text-amber-500 text-xl mb-3"></i>
-            <span class="text-[10px] font-black text-gray-700 uppercase">Esporta Tutto</span>
+        <div class="space-y-4">
+          <!-- Pulsante Backup Remoto Ottimizzato -->
+          <button 
+            (click)="importFromRemote()" 
+            [disabled]="isImportingRemote()"
+            class="w-full bg-indigo-600 text-white p-5 rounded-[28px] shadow-lg shadow-indigo-500/20 active:scale-[0.98] transition-all flex items-center justify-center gap-4 group"
+          >
+            @if (isImportingRemote()) {
+              <i class="fas fa-circle-notch fa-spin"></i>
+              <span class="text-xs font-black uppercase tracking-widest">Sincronizzazione Cloud...</span>
+            } @else {
+              <i class="fas fa-cloud-download-alt text-xl group-hover:animate-bounce"></i>
+              <div class="text-left">
+                <span class="block text-[10px] font-black uppercase tracking-tighter opacity-70">Server: Altervista (via Proxy)</span>
+                <span class="block text-xs font-black uppercase tracking-widest leading-none">Ripristina da Cloud</span>
+              </div>
+            }
           </button>
-          <label class="flex flex-col items-center bg-white p-5 rounded-[28px] border border-gray-100 shadow-sm active:bg-gray-50 active:scale-95 transition-all cursor-pointer">
-            <input type="file" class="hidden" accept=".json" (change)="importData($event)">
-            <i class="fas fa-file-import text-blue-500 text-xl mb-3"></i>
-            <span class="text-[10px] font-black text-gray-700 uppercase">Importa JSON</span>
-          </label>
+
+          <div class="grid grid-cols-2 gap-4">
+            <button (click)="store.exportFullBackup()" class="flex flex-col items-center bg-white p-5 rounded-[28px] border border-gray-100 shadow-sm active:bg-gray-50 active:scale-95 transition-all">
+              <i class="fas fa-archive text-amber-500 text-xl mb-3"></i>
+              <span class="text-[10px] font-black text-gray-700 uppercase">Esporta Locale</span>
+            </button>
+            <label class="flex flex-col items-center bg-white p-5 rounded-[28px] border border-gray-100 shadow-sm active:bg-gray-50 active:scale-95 transition-all cursor-pointer">
+              <input type="file" class="hidden" accept=".json" (change)="importData($event)">
+              <i class="fas fa-file-import text-blue-500 text-xl mb-3"></i>
+              <span class="text-[10px] font-black text-gray-700 uppercase">Importa JSON</span>
+            </label>
+          </div>
         </div>
 
         <button (click)="resetApp()" class="w-full py-4 text-red-500 text-xs font-black uppercase tracking-widest bg-red-50 rounded-2xl mt-4 active:scale-95 transition-all">
@@ -134,6 +155,8 @@ export class SettingsComponent {
   store = inject(StoreService);
   pdfService = inject(PdfService);
   aiService = inject(AiService);
+
+  isImportingRemote = signal(false);
 
   async uploadKb(event: any) {
     const files = event.target.files;
@@ -163,6 +186,60 @@ export class SettingsComponent {
     }
   }
 
+  async importFromRemote() {
+    const targetUrl = `http://cristianmarrone.altervista.org/backup-completo.json?t=${Date.now()}`;
+    const allOriginsProxy = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+    
+    this.isImportingRemote.set(true);
+    
+    try {
+      // Tentativo 1: AllOrigins (più affidabile per stringhe)
+      const response = await fetch(allOriginsProxy);
+      if (!response.ok) throw new Error('Proxy AllOrigins non raggiungibile');
+      
+      const data = await response.json();
+      
+      if (data && data.contents) {
+        this.store.importData(data.contents);
+        alert('Sincronizzazione Cloud completata con successo!');
+        return;
+      }
+      
+      throw new Error('Dati non validi dal primo proxy');
+
+    } catch (e: any) {
+      console.warn('Primo tentativo fallito, provo fallback...', e);
+      
+      try {
+        // Tentativo 2: Codetabs (Fallback)
+        const codeTabsProxy = `https://api.codetabs.com/v1/proxy?url=${encodeURIComponent(targetUrl)}`;
+        const fallbackResponse = await fetch(codeTabsProxy);
+        
+        if (fallbackResponse.ok) {
+          const content = await fallbackResponse.text();
+          this.store.importData(content);
+          alert('Sincronizzazione Cloud completata via Fallback!');
+        } else {
+          throw new Error('Tutti i tentativi di connessione sono falliti.');
+        }
+
+      } catch (fallbackError: any) {
+        console.error('Importazione remota fallita definitivamente:', fallbackError);
+        
+        let errorMsg = 'Impossibile connettersi al server Altervista.\n\n';
+        errorMsg += 'MOTIVO: Il server remoto blocca le richieste dirette (CORS) e i servizi di aggiramento sono temporaneamente indisponibili.\n\n';
+        errorMsg += 'SOLUZIONE MANUALE:\n';
+        errorMsg += '1. Apri questo link nel browser: http://cristianmarrone.altervista.org/backup-completo.json\n';
+        errorMsg += '2. Salva la pagina come file .json\n';
+        errorMsg += '3. Usa il tasto "Importa JSON" qui sotto.';
+        
+        alert(errorMsg);
+      }
+    } finally {
+      this.isImportingRemote.set(false);
+    }
+  }
+
   async importData(event: any) {
     const file = event.target.files[0];
     if (file) {
@@ -177,9 +254,10 @@ export class SettingsComponent {
   }
 
   resetApp() {
-    if (confirm('Vuoi davvero cancellare tutti i dati e i file caricati?')) {
+    if (confirm('Vuoi davvero cancellare tutti i dati e i file caricati? I dati nel localStorage verranno eliminati.')) {
       this.store.clearQuestions();
       this.store.clearKnowledgeBase();
+      localStorage.clear();
     }
   }
 }
