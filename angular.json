@@ -10,7 +10,7 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:application",
+          "builder": "@angular/build:application",
           "options": {
             "outputPath": {
               "base": "dist",
@@ -18,7 +18,6 @@
             },
             "index": "index.html",
             "browser": "index.tsx",
-            "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.json",
             "assets": [],
             "styles": [],
@@ -32,18 +31,7 @@
                   "with": "src/environments/environment.production.ts"
                 }
               ],
-              "outputHashing": "all",
-              "optimization": true,
-              "sourceMap": false,
-              "namedChunks": false,
-              "extractLicenses": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                }
-              ]
+              "outputHashing": "all"
             },
             "development": {
               "optimization": false,
@@ -54,7 +42,7 @@
           "defaultConfiguration": "production"
         },
         "serve": {
-          "builder": "@angular-devkit/build-angular:dev-server",
+          "builder": "@angular/build:dev-server",
           "options": {
             "port": 3000,
             "buildTarget": "app:build:development"
@@ -62,9 +50,6 @@
           "configurations": {
             "production": {
               "buildTarget": "app:build:production"
-            },
-            "development": {
-              "buildTarget": "app:build:development"
             }
           },
           "defaultConfiguration": "development"
